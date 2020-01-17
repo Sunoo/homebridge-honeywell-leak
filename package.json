@@ -1,0 +1,31 @@
+{
+  "name": "homebridge-honeywell-leak",
+  "version": "0.0.1",
+  "description": "Honeywell Weak Leak Detector / Resideo Droplet plugin for Homebridge",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Sunoo/homebridge-honeywell-leak.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "honeywell",
+    "leak",
+    "leak detector",
+    "water leak detector",
+    "resideo",
+    "droplet"
+  ],
+  "author": "David Maher",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sunoo/homebridge-honeywell-leak/issues"
+  },
+  "homepage": "https://github.com/Sunoo/homebridge-honewell-leak#readme",
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.3.0"
+  },
+  "dependencies": {
+    "node-fetch": ">=2.6.0"
+  }
+}
