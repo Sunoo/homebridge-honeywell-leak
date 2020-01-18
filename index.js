@@ -120,10 +120,11 @@ honeywellLeak.prototype.updateState = function(accessory) {
     var fresh = Date.now - Date.parse(accessory.context.time + ".000Z") > 60 * 60 * 1000;
     accessory.getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Name, accessory.context.userDefinedDeviceName + " " + accessory.context.deviceType)
+        .setCharacteristic(Characteristic.Manufacturer, "Honeywell")
         .setCharacteristic(Characteristic.Model, accessory.context.deviceType)
-        .setCharacteristic(Characteristic.SerialNumber, accessory.context.deviceID);
     accessory.getService(Service.LeakSensor)
-        .setCharacteristic(Characteristic.LeakDetected, accessory.context.waterPresent);
+        .setCharacteristic(Characteristic.LeakDetected, accessory.context.waterPresent)
+        .setCharacteristic(Characteristic.StatusActive, true);
     if (!this.hide_temperature) {
         accessory.getService(Service.TemperatureSensor)
             .setCharacteristic(Characteristic.CurrentTemperature, accessory.context.currentSensorReadings.temperature)
@@ -144,12 +145,9 @@ honeywellLeak.prototype.updateState = function(accessory) {
 
 honeywellLeak.prototype.configureAccessory = function(accessory) {
     accessory.on('identify', function(paired, callback) {
-        platform.log(accessory.displayName, "identify requested!");
+        this.log(accessory.displayName, "identify requested!");
         callback();
     });
-
-    accessory.getService(Service.AccessoryInformation)
-        .setCharacteristic(Characteristic.Manufacturer, "Honeywell");
 
     var temp = accessory.getService(Service.TemperatureSensor);
     if (temp && this.hide_temperature) {
