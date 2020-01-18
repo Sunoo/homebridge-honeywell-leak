@@ -60,7 +60,7 @@ honeywellLeak.prototype.getAccessToken = function() {
             .then(json => {
                 this.access_token = json.access_token;
                 this.token_expires = now + json.expires_in * 1000;
-                //this.log("New access token, expires: " + new Date(this.token_expires));
+                this.log("New access token, expires: " + new Date(this.token_expires));
                 return this.access_token;
             });
     } else {
@@ -71,7 +71,7 @@ honeywellLeak.prototype.getAccessToken = function() {
 }
 
 honeywellLeak.prototype.fetchDevices = function() {
-    //this.log("Fetching current devices and statuses.")
+    this.log("Fetching current devices and statuses.")
 
     var newIDs = [];
 
