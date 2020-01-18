@@ -13,7 +13,6 @@ function honeywellLeak(log, config, api) {
     this.log = log;
     this.config = config;
     this.accessories = [];
-    this.token_expires = Date.now();
 
     this.consumer_key = config["consumer_key"];
     this.consumer_secret = config["consumer_secret"];
@@ -31,6 +30,7 @@ function honeywellLeak(log, config, api) {
     if (!this.refresh_token) throw new Error("You must provide a value for refresh_token.");
 
     this.auth_token = Buffer.from(this.consumer_key + ':' + this.consumer_secret).toString('base64');
+    this.token_expires = Date.now();
 
     if (api) {
         this.api = api;
@@ -109,6 +109,7 @@ honeywellLeak.prototype.fetchDevices = function() {
         )
         .catch((error) => {
             this.log(error);
+            this.token_expires = Date.now();
         });
 }
 
