@@ -1,68 +1,30 @@
 const fetch = require('node-fetch');
-var Accessory, Service, Characteristic, UUIDGen;
+var Accessory, Service, Characteristic;
 
 module.exports = function(homebridge) {
-    // Accessory must be created from PlatformAccessory Constructor
     Accessory = homebridge.platformAccessory;
-
-    // Service and Characteristic are from hap-nodejs
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    UUIDGen = homebridge.hap.uuid;
 
-    // For platform plugin to be considered as dynamic platform plugin,
-    // registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
-    homebridge.registerPlatform("homebridge-honeywellLeak", "honeywellLeak", honeywellLeak, true);
+    homebridge.registerPlatform("homebridge-honeywell-leak", "honeywellLeak", honeywellLeak, true);
 }
 
-// Platform constructor
-// config may be null
-// api may be null if launched from old homebridge version
 function honeywellLeak(log, config, api) {
     var platform = this;
     this.log = log;
     this.config = config;
     this.accessories = [];
 
-    /*this.requestServer = http.createServer(function(request, response) {
-      if (request.url === "/add") {
-        this.addAccessory(new Date().toISOString());
-        response.writeHead(204);
-        response.end();
-      }
-
-      if (request.url == "/reachability") {
-        this.updateAccessoriesReachability();
-        response.writeHead(204);
-        response.end();
-      }
-
-      if (request.url == "/remove") {
-        this.removeAccessory();
-        response.writeHead(204);
-        response.end();
-      }
-    }.bind(this));
-
-    this.requestServer.listen(18081, function() {
-      platform.log("Server Listening...");
-    });*/
-
     if (api) {
-        // Save the API object as plugin needs to register new accessory via this object
         this.api = api;
-
-        // Listen to event "didFinishLaunching", this means homebridge already finished loading cached accessories.
-        // Platform Plugin should only register new accessory that doesn't exist in homebridge after this event.
-        // Or start discover new accessories.
-        this.api.on('didFinishLaunching', this.didFinishLaunching.bind(this));
+        this.api.on('didFinishLaunching', this.fetchDevices.bind(this));
     }
 }
 
-honeywellLeak.prototype.didFinishLaunching = function(accessory) {
+honeywellLeak.prototype.fetchDevices = function() {
     var platform = this;
 
-    //TODO: Only refresh access token when expiring, only query Honeywell API every 5 minutes else return cached data
+    //TODO: Only refresh access token when expiring, query Honeywell API every 5 minutes
 
     var auth = Buffer.from(this.config.consumer_key + ':' + this.config.consumer_secret).toString('base64');
 
@@ -83,21 +45,10 @@ honeywellLeak.prototype.didFinishLaunching = function(accessory) {
             })
             .then(res => res.json())
             .then(function(json) {
-                //platform.log(JSON.stringify(json, null, 2));
                 json.forEach(function(location) {
                     location.devices.forEach(function(device) {
                         if (device.deviceClass == "LeakDetector") {
-                            //platform.log(JSON.stringify(device, null, 2));
-                            //LeakSensor, TemperatureSensor, HumidtySensor, BatteryService
-                            platform.log("UUID: " + device.deviceID);
-                            platform.log("Name: " + device.userDefinedDeviceName + " " + device.deviceType);
-                            platform.log("LeakDetected: " + device.waterPresent);
-                            platform.log("CurrentTemperature: " + device.currentSensorReadings.temperature);
-                            platform.log("CurrentRelativeHumidity: " + device.currentSensorReadings.humidity);
-                            platform.log("BatteryLevel: " + device.batteryRemaining);
-                            platform.log("StatusLowBattery: " + (device.batteryRemaining < 30));
-                            platform.log("ChargingState: " + "NOT_CHARGEABLE");
-                            platform.log("Reachable: " + !device.isDeviceOffline);
+                            platform.addUpdateAccessory(device);
                         }
                     })
                 })
@@ -105,74 +56,71 @@ honeywellLeak.prototype.didFinishLaunching = function(accessory) {
         );
 }
 
-// Function invoked when homebridge tries to restore cached accessory.
-// Developer can configure accessory at here (like setup event handler).
-// Update current value.
+honeywellLeak.prototype.updateState = function(accessory) {
+    accessory.getService(Service.LeakSensor)
+        .setCharacteristic(Characteristic.LeakDetected, accessory.context.waterPresent);
+    accessory.getService(Service.TemperatureSensor)
+        .setCharacteristic(Characteristic.CurrentTemperature, accessory.context.currentSensorReadings.temperature)
+        .setCharacteristic(Characteristic.StatusActive, false);
+    accessory.getService(Service.HumiditySensor)
+        .setCharacteristic(Characteristic.CurrentRelativeHumidity, accessory.context.currentSensorReadings.humidity)
+        .setCharacteristic(Characteristic.StatusActive, false);
+    accessory.getService(Service.BatteryService)
+        .setCharacteristic(Characteristic.BatteryLevel, accessory.context.batteryRemaining)
+        .setCharacteristic(Characteristic.ChargingState, 2)
+        .setCharacteristic(Characteristic.StatusLowBattery, accessory.context.batteryRemaining < 30);
+
+    accessory.updateReachability(!accessory.context.isDeviceOffline);
+}
+
 honeywellLeak.prototype.configureAccessory = function(accessory) {
     var platform = this;
 
-    // Set the accessory to reachable if plugin can currently process the accessory,
-    // otherwise set to false and update the reachability later by invoking 
-    // accessory.updateReachability()
-    accessory.reachable = true;
-
     accessory.on('identify', function(paired, callback) {
-        platform.log(accessory.displayName, "Identify!!!");
+        platform.log(accessory.displayName, "identify requested!");
         callback();
     });
 
-    /*if (accessory.getService(Service.Lightbulb)) {
-      accessory.getService(Service.Lightbulb)
-      .getCharacteristic(Characteristic.On)
-      .on('set', function(value, callback) {
-        platform.log(accessory.displayName, "Light -> " + value);
-        callback();
-      });
-    }*/
+    accessory.getService(Service.AccessoryInformation)
+        .setCharacteristic(Characteristic.Manufacturer, "Honeywell")
+        .setCharacteristic(Characteristic.Model, accessory.context.deviceType)
+        .setCharacteristic(Characteristic.SerialNumber, accessory.context.deviceID);
+
+    this.updateState(accessory);
 
     this.accessories.push(accessory);
 }
 
-// Sample function to show how developer can add accessory dynamically from outside event
-honeywellLeak.prototype.addAccessory = function(accessoryName) {
-    this.log("Add Accessory");
+honeywellLeak.prototype.addUpdateAccessory = function(device) {
     var platform = this;
-    var uuid;
 
-    uuid = UUIDGen.generate(accessoryName);
-
-    var newAccessory = new Accessory(accessoryName, uuid);
-    newAccessory.on('identify', function(paired, callback) {
-        platform.log(newAccessory.displayName, "Identify!!!");
-        callback();
+    var accessory = null;
+    this.accessories.forEach(existingDevice => {
+        if (existingDevice.context.deviceID == device.deviceID) {
+            accessory = existingDevice;
+        }
     });
-    // Plugin can save context on accessory to help restore accessory in configureAccessory()
-    // newAccessory.context.something = "Something"
 
-    // Make sure you provided a name for service, otherwise it may not visible in some HomeKit apps
-    newAccessory.addService(Service.Lightbulb, "Test Light")
-        .getCharacteristic(Characteristic.On)
-        .on('set', function(value, callback) {
-            platform.log(newAccessory.displayName, "Light -> " + value);
-            callback();
-        });
+    if (!accessory) {
+        accessory = new Accessory(device.userDefinedDeviceName + " " + device.deviceType, device.deviceID);
 
-    this.accessories.push(newAccessory);
-    this.api.registerPlatformAccessories("homebridge-honeywellLeak", "honeywellLeak", [newAccessory]);
-}
+        accessory.context = device;
 
-honeywellLeak.prototype.updateAccessoriesReachability = function() {
-    this.log("Update Reachability");
-    for (var index in this.accessories) {
-        var accessory = this.accessories[index];
-        accessory.updateReachability(false);
+        accessory.addService(Service.LeakSensor, "Leak Sensor");
+        accessory.addService(Service.TemperatureSensor, "Temperature");
+        accessory.addService(Service.HumiditySensor, "Humidity");
+        accessory.addService(Service.BatteryService, "Battery");
+
+        this.configureAccessory(accessory);
+
+        this.api.registerPlatformAccessories("homebridge-honeywell-leak", "honeywellLeak", [newAccessory]);
+    } else {
+        this.updateState(accessory);
     }
 }
 
-// Sample function to show how developer can remove accessory dynamically from outside event
-honeywellLeak.prototype.removeAccessory = function() {
-    this.log("Remove Accessory");
-    this.api.unregisterPlatformAccessories("homebridge-honeywellLeak", "honeywellLeak", this.accessories);
+honeywellLeak.prototype.removeAccessory = function(accessory) {
+    this.api.unregisterPlatformAccessories("homebridge-honeywell-leak", "honeywellLeak", [accessory]);
 
     this.accessories = [];
 }
