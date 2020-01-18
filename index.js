@@ -145,6 +145,21 @@ honeywellLeak.prototype.configureAccessory = function(accessory) {
         platform.log(accessory.displayName, "identify requested!");
         callback();
     });
+    accessory.removeService(Service.HumiditySensor);
+
+    var temp = accessory.getService(Service.TemperatureSensor);
+    if (temp && this.hide_temperature) {
+        accessory.removeService(temp);
+    } else if (!temp && !this.hide_temperature) {
+        accessory.addService(Service.TemperatureSensor, "Temperature");
+    }
+
+    var hum = accessory.getService(Service.HumiditySensor);
+    if (hum && this.hide_humidity) {
+        accessory.removeService(hum);
+    } else if (!hum && !this.hide_humidity) {
+        accessory.addService(Service.HumiditySensor, "Humidity");
+    }
 
     this.updateState(accessory);
 
@@ -165,18 +180,14 @@ honeywellLeak.prototype.addUpdateAccessory = function(device) {
         accessory.context = device;
 
         accessory.addService(Service.LeakSensor, "Leak Sensor");
-        if (!this.hide_temperature) {
-            accessory.addService(Service.TemperatureSensor, "Temperature");
-        }
-        if (!this.hide_humidity) {
-            accessory.addService(Service.HumiditySensor, "Humidity");
-        }
         accessory.addService(Service.BatteryService, "Battery");
 
         this.configureAccessory(accessory);
 
         this.api.registerPlatformAccessories("homebridge-honeywell-leak", "honeywellLeak", [accessory]);
     } else {
+        accessory.context = device;
+
         this.updateState(accessory);
     }
 }
