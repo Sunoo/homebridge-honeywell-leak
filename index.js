@@ -19,7 +19,7 @@ function honeywellLeak(log, config, api) {
     this.refresh_token = config["refresh_token"];
     this.hide_temperature = config["hide_temperature"] || false;
     this.hide_humidity = config["hide_humidity"] || false;
-    if (config["pollingInterval"] != null) {
+    if (config["polling_minutes"] != null) {
         this.interval = parseInt(config["polling_minutes"]) * 60 * 1000;
     } else {
         this.interval = 5 * 60 * 1000;
@@ -60,7 +60,7 @@ honeywellLeak.prototype.getAccessToken = function() {
             .then(json => {
                 this.access_token = json.access_token;
                 this.token_expires = now + json.expires_in * 1000;
-                this.log("New access token, expires: " + new Date(this.token_expires));
+                //this.log("New access token, expires: " + new Date(this.token_expires));
                 return this.access_token;
             });
     } else {
@@ -71,7 +71,7 @@ honeywellLeak.prototype.getAccessToken = function() {
 }
 
 honeywellLeak.prototype.fetchDevices = function() {
-    this.log("Fetching current devices and statuses.")
+    //this.log("Fetching current devices and statuses.")
 
     var newIDs = [];
 
@@ -115,6 +115,11 @@ honeywellLeak.prototype.fetchDevices = function() {
 
 honeywellLeak.prototype.updateState = function(accessory) {
     var fresh = Date.now - Date.parse(accessory.context.time + ".000Z") > 60 * 60 * 1000;
+    accessory.getService(Service.AccessoryInformation)
+        .setCharacteristic(Characteristic.Name, accessory.context.userDefinedDeviceName + " " + accessory.context.deviceType)
+        .setCharacteristic(Characteristic.Manufacturer, "Honeywell")
+        .setCharacteristic(Characteristic.Model, accessory.context.deviceType)
+        .setCharacteristic(Characteristic.SerialNumber, accessory.context.deviceID);
     accessory.getService(Service.LeakSensor)
         .setCharacteristic(Characteristic.LeakDetected, accessory.context.waterPresent);
     if (!this.hide_temperature) {
@@ -140,11 +145,6 @@ honeywellLeak.prototype.configureAccessory = function(accessory) {
         platform.log(accessory.displayName, "identify requested!");
         callback();
     });
-
-    accessory.getService(Service.AccessoryInformation)
-        .setCharacteristic(Characteristic.Manufacturer, "Honeywell")
-        .setCharacteristic(Characteristic.Model, accessory.context.deviceType)
-        .setCharacteristic(Characteristic.SerialNumber, accessory.context.deviceID);
 
     this.updateState(accessory);
 
