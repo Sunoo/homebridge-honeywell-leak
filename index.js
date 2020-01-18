@@ -24,6 +24,7 @@ function honeywellLeak(log, config, api) {
     } else {
         this.interval = 5 * 60 * 1000;
     }
+    this.debug = config["debug"] || false;
 
     if (!this.consumer_key) throw new Error("You must provide a value for consumer_key.");
     if (!this.consumer_secret) throw new Error("You must provide a value for consumer_secret.");
@@ -71,7 +72,9 @@ honeywellLeak.prototype.getAccessToken = function() {
 }
 
 honeywellLeak.prototype.fetchDevices = function() {
-    this.log("Fetching current devices and statuses.")
+    if (this.debug) {
+        this.log("Fetching current devices and statuses.")
+    }
 
     var newIDs = [];
 
@@ -117,7 +120,6 @@ honeywellLeak.prototype.updateState = function(accessory) {
     var fresh = Date.now - Date.parse(accessory.context.time + ".000Z") > 60 * 60 * 1000;
     accessory.getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Name, accessory.context.userDefinedDeviceName + " " + accessory.context.deviceType)
-        .setCharacteristic(Characteristic.Manufacturer, "Honeywell")
         .setCharacteristic(Characteristic.Model, accessory.context.deviceType)
         .setCharacteristic(Characteristic.SerialNumber, accessory.context.deviceID);
     accessory.getService(Service.LeakSensor)
@@ -145,7 +147,9 @@ honeywellLeak.prototype.configureAccessory = function(accessory) {
         platform.log(accessory.displayName, "identify requested!");
         callback();
     });
-    accessory.removeService(Service.HumiditySensor);
+
+    accessory.getService(Service.AccessoryInformation)
+        .setCharacteristic(Characteristic.Manufacturer, "Honeywell");
 
     var temp = accessory.getService(Service.TemperatureSensor);
     if (temp && this.hide_temperature) {
