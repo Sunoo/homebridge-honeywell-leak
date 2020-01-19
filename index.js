@@ -117,11 +117,12 @@ honeywellLeak.prototype.fetchDevices = function() {
 }
 
 honeywellLeak.prototype.updateState = function(accessory) {
-    var fresh = Date.now - Date.parse(accessory.context.time + ".000Z") > 60 * 60 * 1000;
+    var fresh = Date.now - Date.parse(accessory.context.time + ".000Z") < 60 * 60 * 1000;
     accessory.getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Name, accessory.context.userDefinedDeviceName + " " + accessory.context.deviceType)
         .setCharacteristic(Characteristic.Manufacturer, "Honeywell")
         .setCharacteristic(Characteristic.Model, accessory.context.deviceType)
+        .setCharacteristic(Characteristic.SerialNumber, accessory.context.deviceID);
     accessory.getService(Service.LeakSensor)
         .setCharacteristic(Characteristic.LeakDetected, accessory.context.waterPresent)
         .setCharacteristic(Characteristic.StatusActive, true);
