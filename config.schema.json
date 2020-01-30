@@ -13,13 +13,6 @@
                 "default": "Honeywell Leak",
                 "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
             },
-            "platform": {
-                "title": "Platform",
-                "type": "string",
-                "default": "honeywellLeak",
-                "required": true,
-                "description": "Must always be honeywellLeak."
-            },
             "consumer_key": {
                 "title": "Consumer Key",
                 "type": "string",
