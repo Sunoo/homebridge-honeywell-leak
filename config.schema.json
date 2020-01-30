@@ -1,0 +1,66 @@
+{
+    "pluginAlias": "honeywellLeak",
+    "pluginType": "platform",
+    "headerDisplay": "[Honeywell Leak Detector](https://www.honeywellhome.com/en/products/water-alarms/lyric-wi-fi-water-leak-and-freeze-detector) / [Resideo Droplet](https://www.resideo.com/us/en/products/water/spot-leak-detection/wifi-water-leak-freeze-detector-rchw3610wf1001-u/) plugin for [Homebridge](https://github.com/nfarina/homebridge).",
+    "footerDisplay": "Raise [Issues](https://github.com/Sunoo/homebridge-honeywell-leak/issues) or submit [Pull Requests](https://github.com/Sunoo/homebridge-honeywell-leak/pulls) on [Project Page](https://github.com/Sunoo/homebridge-honeywell-leak).",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Name",
+                "type": "string",
+                "required": true,
+                "default": "Honeywell Leak",
+                "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
+            },
+            "platform": {
+                "title": "Platform",
+                "type": "string",
+                "default": "honeywellLeak",
+                "required": true,
+                "description": "Must always be honeywellLeak."
+            },
+            "consumer_key": {
+                "title": "Consumer Key",
+                "type": "string",
+                "placeholder": "ZSDLrHxcpOWpTknhpm0vZEwTSxJyy0TJ",
+                "required": true,
+                "minLength": 30,
+                "description": "Your OAuth2 consumer key for accessing the Honeywell Home API."
+            },
+            "consumer_secret": {
+                "title": "Consumer Secret",
+                "type": "string",
+                "placeholder": "LDKrtgR8CbCVNHfg",
+                "required": true,
+                "minLength": 15,
+                "description": "Your OAuth2 consumer secret for accessing the Honeywell Home API."
+            },
+            "refresh_token": {
+                "title": "Refresh Token",
+                "type": "string",
+                "placeholder": "mLDpbntbv8gq4yt9pcPOxASV6VPrrzin",
+                "required": true,
+                "minLength": 30,
+                "description": "Your OAuth2 refresh token for accessing the Honeywell Home API."
+            },
+            "polling_minutes": {
+                "title": "Polling Minutes",
+                "type": "integer",
+                "placeholder": "5",
+                "required": false,
+                "description": "Number of minutes between updates, defaults to 5 minutes, per Honeywell's recommendations"
+            },
+            "hide_temperature": {
+                "title": "Hide Temperature Sensor",
+                "type": "boolean",
+                "required": false
+            },
+            "hide_humidity": {
+                "title": "Hide Humidity Sensor",
+                "type": "boolean",
+                "required": false
+            }
+        }
+    }
+}
