@@ -140,8 +140,6 @@ honeywellLeak.prototype.updateState = function(accessory) {
         .setCharacteristic(Characteristic.BatteryLevel, accessory.context.batteryRemaining)
         .setCharacteristic(Characteristic.ChargingState, 2)
         .setCharacteristic(Characteristic.StatusLowBattery, accessory.context.batteryRemaining < 30);
-
-    accessory.updateReachability(!accessory.context.isDeviceOffline);
 }
 
 honeywellLeak.prototype.configureAccessory = function(accessory) {
