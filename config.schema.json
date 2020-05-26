@@ -1,6 +1,7 @@
 {
     "pluginAlias": "honeywellLeak",
     "pluginType": "platform",
+    "singular": true,
     "headerDisplay": "[Honeywell Leak Detector](https://www.honeywellhome.com/en/products/water-alarms/lyric-wi-fi-water-leak-and-freeze-detector) / [Resideo Droplet](https://www.resideo.com/us/en/products/water/spot-leak-detection/wifi-water-leak-freeze-detector-rchw3610wf1001-u/) plugin for [Homebridge](https://github.com/nfarina/homebridge).",
     "footerDisplay": "Raise [Issues](https://github.com/Sunoo/homebridge-honeywell-leak/issues) or submit [Pull Requests](https://github.com/Sunoo/homebridge-honeywell-leak/pulls) on [Project Page](https://github.com/Sunoo/homebridge-honeywell-leak).",
     "schema": {
@@ -19,6 +20,7 @@
                 "placeholder": "ZSDLrHxcpOWpTknhpm0vZEwTSxJyy0TJ",
                 "required": true,
                 "minLength": 30,
+                "maxLength": 30,
                 "description": "Your OAuth2 consumer key for accessing the Honeywell Home API."
             },
             "consumer_secret": {
@@ -27,6 +29,7 @@
                 "placeholder": "LDKrtgR8CbCVNHfg",
                 "required": true,
                 "minLength": 15,
+                "maxLength": 15,
                 "description": "Your OAuth2 consumer secret for accessing the Honeywell Home API."
             },
             "refresh_token": {
@@ -35,6 +38,7 @@
                 "placeholder": "mLDpbntbv8gq4yt9pcPOxASV6VPrrzin",
                 "required": true,
                 "minLength": 30,
+                "maxLength": 30,
                 "description": "Your OAuth2 refresh token for accessing the Honeywell Home API."
             },
             "polling_minutes": {
