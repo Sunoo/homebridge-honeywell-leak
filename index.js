@@ -24,7 +24,6 @@ function honeywellLeak(log, config, api) {
     } else {
         this.interval = 5 * 60 * 1000;
     }
-    this.debug = config["debug"] || false;
 
     if (!this.consumer_key) throw new Error("You must provide a value for consumer_key.");
     if (!this.consumer_secret) throw new Error("You must provide a value for consumer_secret.");
@@ -61,7 +60,7 @@ honeywellLeak.prototype.getAccessToken = function() {
             .then(json => {
                 this.access_token = json.access_token;
                 this.token_expires = now + json.expires_in * 1000;
-                this.log("New access token, expires: " + new Date(this.token_expires));
+                this.log.debug("New access token, expires: " + new Date(this.token_expires));
                 return this.access_token;
             });
     } else {
@@ -72,9 +71,7 @@ honeywellLeak.prototype.getAccessToken = function() {
 }
 
 honeywellLeak.prototype.fetchDevices = function() {
-    if (this.debug) {
-        this.log("Fetching current devices and statuses.")
-    }
+    this.log.debug("Fetching current devices and statuses.");
 
     var newIDs = [];
 
@@ -111,7 +108,7 @@ honeywellLeak.prototype.fetchDevices = function() {
             })
         )
         .catch((error) => {
-            this.log(error);
+            this.log.error(error);
             this.token_expires = Date.now();
         });
 }

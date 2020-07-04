@@ -44,7 +44,7 @@
             "polling_minutes": {
                 "title": "Polling Minutes",
                 "type": "integer",
-                "default": "5",
+                "default": 5,
                 "required": false,
                 "description": "Number of minutes between updates, defaults to 5 minutes, per Honeywell's recommendations"
             },
