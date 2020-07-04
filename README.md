@@ -1,4 +1,6 @@
 # homebridge-honeywell-leak
+[![npm](https://img.shields.io/npm/v/homebridge-honeywell-leak) ![npm](https://img.shields.io/npm/dt/homebridge-honeywell-leak)](https://www.npmjs.com/package/homebridge-honeywell-leak)
+
 [Honeywell Leak Detector](https://www.honeywellhome.com/en/products/water-alarms/lyric-wi-fi-water-leak-and-freeze-detector) / [Resideo Droplet](https://www.resideo.com/us/en/products/water/spot-leak-detection/wifi-water-leak-freeze-detector-rchw3610wf1001-u/) plugin for [Homebridge](https://github.com/nfarina/homebridge)
 
 # Installation
