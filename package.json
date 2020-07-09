@@ -17,7 +17,7 @@
     "droplet"
   ],
   "author": "David Maher",
-  "license": "BSD",
+  "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/Sunoo/homebridge-honeywell-leak/issues"
   },
