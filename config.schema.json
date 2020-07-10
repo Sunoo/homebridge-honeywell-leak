@@ -19,8 +19,8 @@
                 "type": "string",
                 "placeholder": "ZSDLrHxcpOWpTknhpm0vZEwTSxJyy0TJ",
                 "required": true,
-                "minLength": 30,
-                "maxLength": 30,
+                "minLength": 32,
+                "maxLength": 32,
                 "description": "Your OAuth2 consumer key for accessing the Honeywell Home API."
             },
             "consumer_secret": {
@@ -28,8 +28,8 @@
                 "type": "string",
                 "placeholder": "LDKrtgR8CbCVNHfg",
                 "required": true,
-                "minLength": 15,
-                "maxLength": 15,
+                "minLength": 16,
+                "maxLength": 16,
                 "description": "Your OAuth2 consumer secret for accessing the Honeywell Home API."
             },
             "refresh_token": {
@@ -37,8 +37,8 @@
                 "type": "string",
                 "placeholder": "mLDpbntbv8gq4yt9pcPOxASV6VPrrzin",
                 "required": true,
-                "minLength": 30,
-                "maxLength": 30,
+                "minLength": 32,
+                "maxLength": 32,
                 "description": "Your OAuth2 refresh token for accessing the Honeywell Home API."
             },
             "polling_minutes": {
