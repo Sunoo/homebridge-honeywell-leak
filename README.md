@@ -39,4 +39,4 @@ Fields:
 
 # Getting OAuth2 Values
 
-The easiest way to get set up for OAuth2 is to use [honeywell-js-setup](https://github.com/homespun/honeywell-js-setup). Just ignore their sample config.json file and use the values that tool gives you with my example above.
+The easiest way to get set up for OAuth2 is to use [honeywellhome-api](https://github.com/homebridge-plugins/honeywellhome-api). Just ignore their sample config.json file and use the values that tool gives you with my example above.
