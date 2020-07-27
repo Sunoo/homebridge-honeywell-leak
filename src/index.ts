@@ -9,6 +9,7 @@ import {
   PlatformConfig
 } from 'homebridge';
 import fetch from 'node-fetch';
+import { HoneywellLeakPlatformConfig } from './configTypes';
 
 let hap: HAP;
 let Accessory: typeof PlatformAccessory;
@@ -19,7 +20,7 @@ const PLATFORM_NAME = 'honeywellLeak';
 class HoneywellLeakPlatform implements DynamicPlatformPlugin {
   private readonly log: Logging;
   private readonly api: API;
-  private readonly config: PlatformConfig;
+  private readonly config: HoneywellLeakPlatformConfig;
   private readonly accessories: Array<PlatformAccessory>;
   private readonly auth_token: string;
   private token_expires: number;
@@ -29,7 +30,7 @@ class HoneywellLeakPlatform implements DynamicPlatformPlugin {
 
   constructor(log: Logging, config: PlatformConfig, api: API) {
     this.log = log;
-    this.config = config;
+    this.config = config as unknown as HoneywellLeakPlatformConfig;
     this.api = api;
     this.accessories = [];
 
@@ -58,7 +59,7 @@ class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     setInterval(this.fetchDevices.bind(this), interval);
   }
 
-  getAccessToken(): Promise<any> {
+  getAccessToken(): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
     const now = Date.now();
     if (now > this.token_expires) {
       return fetch('https://api.honeywell.com/oauth2/token', {
@@ -108,8 +109,8 @@ class HoneywellLeakPlatform implements DynamicPlatformPlugin {
           }
         })
         .then(json => {
-          json.forEach((location: any) => {
-            location.devices.forEach((device: any) => {
+          json.forEach((location: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+            location.devices.forEach((device: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
               if (device.deviceClass == 'LeakDetector') {
                 this.addUpdateAccessory(device);
                 newIDs.push(device.deviceID);
@@ -197,7 +198,7 @@ class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     this.accessories.push(accessory);
   }
 
-  addUpdateAccessory(device: any): void {
+  addUpdateAccessory(device: any): void { // eslint-disable-line @typescript-eslint/no-explicit-any
     let accessory = this.accessories.find(cachedAccessory => {
       return cachedAccessory.context.deviceID == device.deviceID;
     });
