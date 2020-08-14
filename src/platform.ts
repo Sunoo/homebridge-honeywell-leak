@@ -91,23 +91,27 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
    * Verify the config passed to the plugin is valid
    */
   verifyConfig() {
-    this.config.hide_temperature;
-    this.config.hide_humidity;
-    this.config.polling_minutes = this.config.polling_minutes || 1800; // default 1800 seconds
+    if (!this.config.options || typeof this.config.options !== 'object') {
+      this.config.options = {};
+    }
+    this.config.options.hide_humidity;
+    this.config.options.hide_temperature;
 
-    if (!this.config.consumer_secret && this.config.polling_minutes < 1800) {
+    this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
+
+    if (!this.config.credentials.consumerSecret && this.config.options.ttl < 1800) {
       this.log.debug('TTL must be set to 1800 or higher unless you setup your own consumerSecret.');
-      this.config.polling_minutes = 1800;
+      this.config.options.ttl = 1800;
     }
 
-    if (!this.config.consumer_secret) {
-      throw new Error('You must provide a value for consumer_secret.');
+    if (!this.config.credentials) {
+      throw new Error('Missing Credentials');
     }
-    if (!this.config.consumer_key) {
-      throw new Error('You must provide a value for consumer_key.');
+    if (!this.config.credentials.consumerKey) {
+      throw new Error('Missing consumerKey');
     }
-    if (!this.config.refresh_token) {
-      throw new Error('You must provide a value for refresh_token.');
+    if (!this.config.credentials.refreshToken) {
+      throw new Error('Missing refreshToken');
     }
   }
 
@@ -117,7 +121,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
   async getAccessToken() {
     let result: any;
 
-    if (this.config.consumer_secret) {
+    if (this.config.credentials.consumerSecret) {
       result = (await axios({
         url: AuthURL,
         method: 'POST',
@@ -125,12 +129,12 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         auth: {
-          username: this.config.consumer_key,
-          password: this.config.consumer_secret,
+          username: this.config.credentials.consumerKey,
+          password: this.config.credentials.consumerSecret,
         },
         data: qs.stringify({
           grant_type: 'refresh_token',
-          refresh_token: this.config.refresh_token,
+          refresh_token: this.config.credentials.refreshToken,
         }),
         responseType: 'json',
       })).data;
@@ -140,8 +144,8 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       try {
         result = (await axios.post(UIurl, 
           {
-            consumerKey: this.config.consumer_key,
-            refresh_token: this.config.refresh_token,
+            consumerKey: this.config.credentials.consumerKey,
+            refresh_token: this.config.credentials.refreshToken,
           },
         )).data;
       } catch (e) {
@@ -150,16 +154,16 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       }
     }
 
-    this.config.access_token = result.access_token;
-    this.log.warn('Got access token:', this.config.access_token);
+    this.config.credentials.accessToken = result.access_token;
+    this.log.warn('Got access token:', this.config.credentials.accessToken);
 
     // check if the refresh token has changed
-    if (result.refresh_token !== this.config.refresh_token) {
+    if (result.refresh_token !== this.config.credentials.refreshToken) {
       this.log.warn('New refresh token:', result.refresh_token);
       await this.updateRefreshToken(result.refresh_token);
     }
     
-    this.config.refresh_token = result.refresh_token;
+    this.config.credentials.refreshToken = result.refresh_token;
   }
 
   /**
@@ -195,7 +199,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       }
 
       // set the refresh token
-      pluginConfig.refresh_token = newRefreshToken;
+      pluginConfig.credentials.refreshToken = newRefreshToken;
 
       // save the config, ensuring we maintain pretty json
       writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));

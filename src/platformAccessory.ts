@@ -90,7 +90,7 @@ export class LeakSensorPlatformAccessory {
   this.service.getCharacteristic(this.platform.Characteristic.LeakDetected)
     .on('get', this.handleLeakDetectedGet.bind(this));
 
-  if (!this.platform.config.hide_temperature) {
+  if (!this.platform.config.options.hide_temperature) {
   // Temperature Sensor
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor) ?
       accessory.getService(this.platform.Service.TemperatureSensor) : accessory.addService(this.platform.Service.TemperatureSensor, 
@@ -107,7 +107,7 @@ export class LeakSensorPlatformAccessory {
       .on('get', this.handleTempStatusActiveGet.bind(this));  
   }
 
-  if (!this.platform.config.hide_humidity) {
+  if (!this.platform.config.options.hide_humidity) {
     // Humidity Sensor
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor) ?
       accessory.getService(this.platform.Service.HumiditySensor) : accessory.addService(this.platform.Service.HumiditySensor, 
@@ -180,7 +180,7 @@ export class LeakSensorPlatformAccessory {
     }
 
     // Temperature Sensor
-    if (!this.platform.config.hide_temperature) {
+    if (!this.platform.config.options.hide_temperature) {
       this.CurrentTemperature = this.toCelsius(this.device.currentSensorReadings.temperature);
       if (this.device.hasDeviceCheckedIn === true) {
         this.TempStatusActive = true;
@@ -190,7 +190,7 @@ export class LeakSensorPlatformAccessory {
     }
 
     // HumiditySensor
-    if (!this.platform.config.hide_humidity) {
+    if (!this.platform.config.options.hide_humidity) {
       this.CurrentRelativeHumidity = this.device.currentSensorReadings.humidity;
       if (this.device.hasDeviceCheckedIn === true) {
         this.HumidityStatusActive = true;
