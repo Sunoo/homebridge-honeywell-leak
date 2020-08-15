@@ -5,7 +5,7 @@ import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 
-import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, UIurl } from './settings';
+import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
 import { LeakSensorPlatformAccessory } from './platformAccessory';
 
 /**
@@ -238,23 +238,17 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       this.log.debug(locationId);
       this.log.debug(location);
       this.log.debug(`# of Leak Sensors Found at ${location.name}: ${location.devices.length}.`);  
-      // get the devices
-      /*  const devices = (await this.axios.get(DeviceURL, {
+      const devices = (await this.axios.get(DeviceURL, {
         params: {
           locationId: location.locationID,
         },
-      })).data; */
-      for (const device of location.devices) {
+      })).data;
+      for (const device of devices) {
         this.log.debug(device);
         this.log.debug(device.deviceID);
 
-        // generate a unique id for the accessory this should be generated from
-        // something globally unique, but constant, for example, the device serial
-        // number or MAC address
-        if (device.isAlive && device.deviceClass === 'LeakDetector') {
-          // eslint-disable-next-line max-len
-          this.log.debug(`LeakSensor UDID: ${device.name}${device.deviceID}`);
-          // eslint-disable-next-line max-len
+        if (device.isAlive === true && device.deviceClass === 'LeakDetector') {
+          this.log.debug(`Leak Sensor UDID: ${device.name}${device.deviceID}`);
           const uuid = this.api.hap.uuid.generate(`${device.name}${device.deviceID}`);
 
           // see if an accessory with the same uuid has already been registered and restored from
