@@ -168,15 +168,15 @@ export class LeakSensorPlatformAccessory {
   parseStatus() {
   // Set Sensor State
 
-    if (this.device.accessoryValue.status === 'Ok') {
+    if (this.device.hasDeviceCheckedIn === true) {
       this.StatusActive = true;
-    } else if (this.device.accessoryValue.status !== 'Ok') {
+    } else if (this.device.hasDeviceCheckedIn !== true) {
       this.StatusActive = false;
     }
-    if (this.device.accessoryValue.status === 'Ok') {
-      this.LeakDetected = true;
-    } else if (this.device.accessoryValue.status !== 'Ok') {
-      this.LeakDetected = false;
+    if (this.device.LeakDetected === true) {
+      this.LeakDetected = 1;
+    } else if (this.device.LeakDetected !== true) {
+      this.LeakDetected = 0;
     }
 
     // Temperature Sensor
