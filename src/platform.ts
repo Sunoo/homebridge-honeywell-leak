@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
 import { interval } from 'rxjs';
 import axios, { AxiosInstance } from 'axios';
@@ -46,9 +45,9 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
 
     // setup axios interceptor to add headers / api key to each request
     this.axios.interceptors.request.use((request) => {
-      request.headers.Authorization = 'Bearer ' + this.config.access_token;
+      request.headers.Authorization = 'Bearer ' + this.config.credentials.accessToken;
       request.params = request.params || {};
-      request.params.apikey = this.config.consumer_key;
+      request.params.apikey = this.config.credentials.consumerKey;
       request.headers['Content-Type'] = 'application/json';
       return request;
     });
@@ -247,7 +246,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
         this.log.debug(device);
         this.log.debug(device.deviceID);
 
-        if (device.isAlive === true && device.deviceClass === 'LeakDetector') {
+        if (device.isAlive && device.deviceClass === 'LeakDetector') { 
           this.log.debug(`Leak Sensor UDID: ${device.name}${device.deviceID}`);
           const uuid = this.api.hap.uuid.generate(`${device.name}${device.deviceID}`);
 
