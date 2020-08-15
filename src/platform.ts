@@ -247,8 +247,8 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
         this.log.debug(device.deviceID);
 
         if (device.isAlive && device.deviceClass === 'LeakDetector') { 
-          this.log.debug(`Leak Sensor UDID: ${device.name}${device.deviceID}`);
-          const uuid = this.api.hap.uuid.generate(`${device.name}${device.deviceID}`);
+          this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}${device.deviceID}`);
+          const uuid = this.api.hap.uuid.generate(`${device.userDefinedDeviceName}${device.deviceID}`);
 
           // see if an accessory with the same uuid has already been registered and restored from
           // the cached devices we stored in the `configureAccessory` method above
@@ -268,11 +268,11 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
 
           } else {
             // the accessory does not yet exist, so we need to create it
-            this.log.info('Adding new accessory:', device.name);
-            this.log.debug(`Registering new device: ${device.name} - ${device.deviceID}`);
+            this.log.info('Adding new accessory:', device.userDefinedDeviceName);
+            this.log.debug(`Registering new device: ${device.userDefinedDeviceName} - ${device.deviceID}`);
 
             // create a new accessory
-            const accessory = new this.api.platformAccessory(device.name, uuid);
+            const accessory = new this.api.platformAccessory(device.userDefinedDeviceName, uuid);
 
             // store a copy of the device object in the `accessory.context`
             // the `context` property can be used to store any data about the accessory you may need
@@ -288,7 +288,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
           }
         } else {
           // eslint-disable-next-line max-len
-          this.log.info(`Ignoring device named ${device.name} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
+          this.log.info(`Ignoring device named ${device.userDefinedDeviceName} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
         }
       }
     }
