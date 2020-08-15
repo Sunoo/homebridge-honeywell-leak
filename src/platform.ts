@@ -5,7 +5,7 @@ import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 
-import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
+import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, UIurl } from './settings';
 import { LeakSensorPlatformAccessory } from './platformAccessory';
 
 /**
@@ -239,12 +239,12 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       this.log.debug(location);
       this.log.debug(`# of Leak Sensors Found at ${location.name}: ${location.devices.length}.`);  
       // get the devices
-      const devices = (await this.axios.get(DeviceURL, {
+      /*  const devices = (await this.axios.get(DeviceURL, {
         params: {
           locationId: location.locationID,
         },
-      })).data;
-      for (const device of devices) {
+      })).data; */
+      for (const device of location.devices) {
         this.log.debug(device);
         this.log.debug(device.deviceID);
 
