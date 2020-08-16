@@ -167,32 +167,32 @@ export class LeakSensorPlatformAccessory {
  */
   parseStatus() {
   // Set Sensor State
-    this.StatusActive === this.device.hasDeviceCheckedIn;
+    this.StatusActive = this.device.hasDeviceCheckedIn;
     if (this.device.LeakDetected === true) {
-      this.LeakDetected === 1;
+      this.LeakDetected = 1;
     } else if (this.device.LeakDetected !== true) {
-      this.LeakDetected === 0;
+      this.LeakDetected = 0;
     }
 
     // Temperature Sensor
     if (!this.platform.config.options.hide_temperature) {
-      this.CurrentTemperature === this.toCelsius(this.device.currentSensorReadings.temperature);
-      this.TempStatusActive === this.device.hasDeviceCheckedIn;
+      this.CurrentTemperature = this.toCelsius(this.device.currentSensorReadings.temperature);
+      this.TempStatusActive = this.device.hasDeviceCheckedIn;
     }
 
     // HumiditySensor
     if (!this.platform.config.options.hide_humidity) {
-      this.CurrentRelativeHumidity === this.device.currentSensorReadings.humidity;
-      this.HumidityStatusActive === this.device.hasDeviceCheckedIn;
+      this.CurrentRelativeHumidity = this.device.currentSensorReadings.humidity;
+      this.HumidityStatusActive = this.device.hasDeviceCheckedIn;
     }
 
     // Battery Service
-    this.BatteryLevel === this.device.batteryRemaining;
-    this.ChargingState === 2;
+    this.BatteryLevel = this.device.batteryRemaining;
+    this.ChargingState = 2;
     if (this.device.batteryRemaining < 30) {
-      this.StatusLowBattery === 1;
+      this.StatusLowBattery = 1;
     } else if (this.device.batteryRemaining > 30) {
-      this.StatusLowBattery === 0;
+      this.StatusLowBattery = 0;
     }
   }
 
