@@ -105,8 +105,9 @@ export class LeakSensorPlatformAccessory {
     this.temperatureService
       .getCharacteristic(this.platform.Characteristic.StatusActive)
       .on('get', this.handleTempStatusActiveGet.bind(this));  
+  } else {
+    accessory.removeService(this.temperatureService);
   }
-  this.platform.config.options.hide_temperature = accessory.removeService(this.temperatureService);
 
   if (!this.platform.config.options.hide_humidity) {
     // Humidity Sensor
@@ -123,8 +124,9 @@ export class LeakSensorPlatformAccessory {
     this.humidityService
       .getCharacteristic(this.platform.Characteristic.StatusActive)
       .on('get', this.handleHumidityStatusActiveGet.bind(this));
+  } else {
+    accessory.removeService(this.humidityService);
   }
-  this.platform.config.options.hide_humidity = accessory.removeService(this.humidityService);
 
   // Battery Sensor
   this.batteryService = accessory.getService(this.platform.Service.BatteryService) ?
