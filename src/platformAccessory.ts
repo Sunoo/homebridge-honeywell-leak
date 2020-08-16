@@ -176,7 +176,7 @@ export class LeakSensorPlatformAccessory {
 
     // Temperature Sensor
     if (!this.platform.config.options.hide_temperature) {
-      this.CurrentTemperature = this.toCelsius(this.device.currentSensorReadings.temperature);
+      this.CurrentTemperature = this.device.currentSensorReadings.temperature;
       this.TempStatusActive = this.device.hasDeviceCheckedIn;
     }
 
