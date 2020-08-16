@@ -107,7 +107,7 @@ export class LeakSensorPlatformAccessory {
       .on('get', this.handleTempStatusActiveGet.bind(this));  
   }
   if (this.platform.config.options.hide_temperature) {
-    this.temperatureService = accessory.removeService(this.temperatureService);
+    this.temperatureService = accessory.removeService;
   }
 
   if (!this.platform.config.options.hide_humidity) {
@@ -127,7 +127,7 @@ export class LeakSensorPlatformAccessory {
       .on('get', this.handleHumidityStatusActiveGet.bind(this));
   }
   if (this.platform.config.options.hide_humidity) {
-    this.humidityService = accessory.removeService(this.humidityService);
+    this.humidityService = accessory.removeService;
   }
 
   // Battery Sensor
