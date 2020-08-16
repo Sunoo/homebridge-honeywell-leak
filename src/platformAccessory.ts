@@ -224,6 +224,17 @@ export class LeakSensorPlatformAccessory {
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
     this.service.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
+    if (!this.platform.config.options.hide_temperature){
+      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
+      this.temperatureService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.TempStatusActive);
+    }
+    if (!this.platform.config.options.hide_humidity) {
+      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
+      this.humidityService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.HumidityStatusActive);
+    }
+    this.batteryService.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
+    this.batteryService.updateCharacteristic(this.platform.Characteristic.ChargingState, this.ChargingState);
+    this.batteryService.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
   }
 
   /**
