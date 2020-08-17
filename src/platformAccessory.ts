@@ -63,8 +63,8 @@ export class LeakSensorPlatformAccessory {
 
   // get the LightBulb service if it exists, otherwise create a new LightBulb service
   // you can create multiple services for each accessory
-  this.service = this.accessory.getService(this.platform.Service.TemperatureSensor) || 
-  this.accessory.addService(this.platform.Service.TemperatureSensor), 
+  this.service = this.accessory.getService(this.platform.Service.LeakSensor) || 
+  this.accessory.addService(this.platform.Service.LeakSensor), 
   `${this.device.userDefinedDeviceName} Leak Sensor`;
 
   // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
