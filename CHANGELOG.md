@@ -2,8 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Version 2.0.0](https://github.com/donavanbecker/homebridge-honeywell-leak/compare/v1.1.0...v2.0.0) (2020-08-XX)
-
+## [Version 2.0.0](https://github.com/donavanbecker/homebridge-honeywell-leak/compare/v1.1.0...v2.0.0) (2020-08-17)
 
 # IMPORTANT
 ### Major Changes

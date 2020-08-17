@@ -1,34 +1,29 @@
 {
   "displayName": "Homebridge Honeywell Leak",
   "name": "homebridge-honeywell-leak",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Honeywell Weak Leak Detector / Resideo Droplet plugin for Homebridge.",
-  "author": "David Maher",
-  "license": "BSD-2-Clause",
+  "author": "donavanbecker",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Sunoo/homebridge-honeywell-leak.git"
+    "url": "git://github.com/donavanbecker/homebridge-honeywell-leak.git"
   },
   "bugs": {
-    "url": "https://github.com/Sunoo/homebridge-honeywell-leak/issues"
+    "url": "https://github.com/donavanbecker/homebridge-honeywell-leak/issues"
   },
-  "homepage": "https://github.com/Sunoo/homebridge-honeywell-leak#readme",
+  "homepage": "https://github.com/donavanbecker/homebridge-honeywell-leak#readme",
   "engines": {
     "node": ">=12.0.0",
     "homebridge": ">=1.1.2"
   },
   "main": "dist/index.js",
   "scripts": {
-    "format": "markdownlint --fix *.md",
     "developer": "DEBUG=honeywell-home homebridge -D -U `pwd` -P `pwd`",
-    "lint": "eslint src/**.ts --fix",
-    "lint-check": "eslint src/*.ts",
+    "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
-    "clean": "rimraf ./dist ./coverage",
-    "build": "rimraf ./dist ./coverage && tsc",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run lint && npm run build",
-    "postpublish": "npm run clean"
+    "build": "rimraf ./dist && tsc",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
     "homebridge-plugin",
@@ -38,13 +33,6 @@
     "water leak detector",
     "resideo",
     "droplet"
-  ],
-  "files": [
-    "config.schema.json",
-    "dist/**/*",
-    "LICENSE",
-    "package.json",
-    "README.md"
   ],
   "dependencies": {
     "axios": "^0.19.2",
@@ -56,7 +44,6 @@
     "@typescript-eslint/parser": "^3.9.0",
     "eslint": "^7.6.0",
     "homebridge": "^1.1.2",
-    "markdownlint-cli": "^0.23.2",
     "nodemon": "^2.0.4",
     "rimraf": "^3.0.2",
     "ts-node": "^8.10.2",
