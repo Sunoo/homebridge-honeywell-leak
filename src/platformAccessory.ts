@@ -54,115 +54,115 @@ export class LeakSensorPlatformAccessory {
     this.doSensorUpdate = new Subject();
     this.SensorUpdateInProgress = false;
 
-  // set accessory information
-  this.accessory.getService(this.platform.Service.AccessoryInformation)!
-    .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-    .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceType)
-    .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
-    .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.device.firmwareVer);
+    // set accessory information
+    this.accessory.getService(this.platform.Service.AccessoryInformation)!
+      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
+      .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceType)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.device.firmwareVer);
 
-  // get the LightBulb service if it exists, otherwise create a new LightBulb service
-  // you can create multiple services for each accessory
-  this.service = this.accessory.getService(this.platform.Service.LeakSensor) || 
-  this.accessory.addService(this.platform.Service.LeakSensor), 
-  `${this.device.userDefinedDeviceName} Leak Sensor`;
+    // get the LightBulb service if it exists, otherwise create a new LightBulb service
+    // you can create multiple services for each accessory
+    this.service = this.accessory.getService(this.platform.Service.LeakSensor) ||
+      this.accessory.addService(this.platform.Service.LeakSensor),
+      `${this.device.userDefinedDeviceName} Leak Sensor`;
 
-  // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
-  // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-  // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE');
+    // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
+    // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
+    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE');
 
-  // set the service name, this is what is displayed as the default name on the Home app
-  // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-  this.service.setCharacteristic(this.platform.Characteristic.Name, 
-    `${this.device.userDefinedDeviceName} ${this.device.deviceType}`);
+    // set the service name, this is what is displayed as the default name on the Home app
+    // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
+    this.service.setCharacteristic(this.platform.Characteristic.Name,
+      `${this.device.userDefinedDeviceName} ${this.device.deviceType}`);
 
-  // each service must implement at-minimum the "required characteristics" for the given service type
-  // see https://developers.homebridge.io/#/service/
+    // each service must implement at-minimum the "required characteristics" for the given service type
+    // see https://developers.homebridge.io/#/service/
 
-  // Do initial device parse
-  this.parseStatus();
+    // Do initial device parse
+    this.parseStatus();
 
-  // Set Active
-  this.service.getCharacteristic(this.platform.Characteristic.StatusActive)
-    .on('get', this.handleLeakStatusActiveGet.bind(this));
+    // Set Active
+    this.service.getCharacteristic(this.platform.Characteristic.StatusActive)
+      .on('get', this.handleLeakStatusActiveGet.bind(this));
 
-  // Set Leak Detected
-  this.service.getCharacteristic(this.platform.Characteristic.LeakDetected)
-    .on('get', this.handleLeakDetectedGet.bind(this));
+    // Set Leak Detected
+    this.service.getCharacteristic(this.platform.Characteristic.LeakDetected)
+      .on('get', this.handleLeakDetectedGet.bind(this));
 
-  if (!this.temperatureService && !this.platform.config.options.hide_temperature) {
-  // Temperature Sensor
-    this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor) ?
-      accessory.getService(this.platform.Service.TemperatureSensor) : accessory.addService(this.platform.Service.TemperatureSensor, 
-        `${this.device.userDefinedDeviceName} Temperature Sensor`);
+    if (!this.temperatureService && !this.platform.config.options.hide_temperature) {
+      // Temperature Sensor
+      this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor) ?
+        accessory.getService(this.platform.Service.TemperatureSensor) : accessory.addService(this.platform.Service.TemperatureSensor,
+          `${this.device.userDefinedDeviceName} Temperature Sensor`);
 
-    // Set Temperature Sensor - Current Temperature  
-    this.temperatureService
-      .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-      .on('get', this.handleCurrentTemperatureGet.bind(this));
+      // Set Temperature Sensor - Current Temperature  
+      this.temperatureService
+        .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+        .on('get', this.handleCurrentTemperatureGet.bind(this));
 
-    // Set Temperature Sensor - Status Active 
-    this.temperatureService
-      .getCharacteristic(this.platform.Characteristic.StatusActive)
-      .on('get', this.handleTempStatusActiveGet.bind(this));  
-  } else if (this.temperatureService && this.platform.config.options.hide_temperature) {
-    accessory.removeService(this.temperatureService);
-  }
+      // Set Temperature Sensor - Status Active 
+      this.temperatureService
+        .getCharacteristic(this.platform.Characteristic.StatusActive)
+        .on('get', this.handleTempStatusActiveGet.bind(this));
+    } else if (this.temperatureService && this.platform.config.options.hide_temperature) {
+      accessory.removeService(this.temperatureService);
+    }
 
-  if (!this.humidityService && !this.platform.config.options.hide_humidity) {
-    // Humidity Sensor
-    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor) ?
-      accessory.getService(this.platform.Service.HumiditySensor) : accessory.addService(this.platform.Service.HumiditySensor, 
-        `${this.device.userDefinedDeviceName} Humidity Sensor`);
+    if (!this.humidityService && !this.platform.config.options.hide_humidity) {
+      // Humidity Sensor
+      this.humidityService = accessory.getService(this.platform.Service.HumiditySensor) ?
+        accessory.getService(this.platform.Service.HumiditySensor) : accessory.addService(this.platform.Service.HumiditySensor,
+          `${this.device.userDefinedDeviceName} Humidity Sensor`);
 
-    // Set Humidity Sensor Current Relative Humidity
-    this.humidityService
-      .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
-      .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
+      // Set Humidity Sensor Current Relative Humidity
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
 
-    // Set Humidity Sensor Current Relative Humidity
-    this.humidityService
-      .getCharacteristic(this.platform.Characteristic.StatusActive)
-      .on('get', this.handleHumidityStatusActiveGet.bind(this));
-  } else if (this.humidityService && this.platform.config.options.hide_humidity) {
-    accessory.removeService(this.humidityService);
-  }
+      // Set Humidity Sensor Current Relative Humidity
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.StatusActive)
+        .on('get', this.handleHumidityStatusActiveGet.bind(this));
+    } else if (this.humidityService && this.platform.config.options.hide_humidity) {
+      accessory.removeService(this.humidityService);
+    }
 
-  // Battery Sensor
-  this.batteryService = accessory.getService(this.platform.Service.BatteryService) ?
-    accessory.getService(this.platform.Service.BatteryService) : accessory.addService(this.platform.Service.BatteryService, 
-      `${this.device.userDefinedDeviceName} Battery`);
+    // Battery Sensor
+    this.batteryService = accessory.getService(this.platform.Service.BatteryService) ?
+      accessory.getService(this.platform.Service.BatteryService) : accessory.addService(this.platform.Service.BatteryService,
+        `${this.device.userDefinedDeviceName} Battery`);
 
-  // Set Motion Sensor Detected
-  this.batteryService
-    .getCharacteristic(this.platform.Characteristic.BatteryLevel)
-    .on('get', this.handleBatteryLevelGet.bind(this));
+    // Set Motion Sensor Detected
+    this.batteryService
+      .getCharacteristic(this.platform.Characteristic.BatteryLevel)
+      .on('get', this.handleBatteryLevelGet.bind(this));
 
-  // Set Motion Sensor Detected
-  this.batteryService
-    .getCharacteristic(this.platform.Characteristic.ChargingState)
-    .on('get', this.handleChargingStateGet.bind(this));
-    
-  // Set Motion Sensor Detected
-  this.batteryService
-    .getCharacteristic(this.platform.Characteristic.StatusLowBattery)
-    .on('get', this.handleStatusLowBatteryGet.bind(this));  
+    // Set Motion Sensor Detected
+    this.batteryService
+      .getCharacteristic(this.platform.Characteristic.ChargingState)
+      .on('get', this.handleChargingStateGet.bind(this));
 
-  // Retrieve initial values and updateHomekit
-  this.refreshStatus();
+    // Set Motion Sensor Detected
+    this.batteryService
+      .getCharacteristic(this.platform.Characteristic.StatusLowBattery)
+      .on('get', this.handleStatusLowBatteryGet.bind(this));
 
-  // Start an update interval
-  interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.SensorUpdateInProgress)).subscribe(() => {
+    // Retrieve initial values and updateHomekit
     this.refreshStatus();
-  });
 
-  // Watch for thermostat change events
-  // We put in a debounce of 100ms so we don't make duplicate calls
-  this.doSensorUpdate.pipe(tap(() => {
-    this.SensorUpdateInProgress = true;
-  }), debounceTime(100)).subscribe(async () => {
-    this.SensorUpdateInProgress = false;
-  });
+    // Start an update interval
+    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.SensorUpdateInProgress)).subscribe(() => {
+      this.refreshStatus();
+    });
+
+    // Watch for thermostat change events
+    // We put in a debounce of 100ms so we don't make duplicate calls
+    this.doSensorUpdate.pipe(tap(() => {
+      this.SensorUpdateInProgress = true;
+    }), debounceTime(100)).subscribe(async () => {
+      this.SensorUpdateInProgress = false;
+    });
 
   }
 
@@ -170,7 +170,7 @@ export class LeakSensorPlatformAccessory {
  * Parse the device status from the honeywell api
  */
   parseStatus() {
-  // Set Sensor State
+    // Set Sensor State
     this.StatusActive = this.device.hasDeviceCheckedIn;
     if (this.device.LeakDetected === true) {
       this.LeakDetected = 1;
@@ -228,7 +228,7 @@ export class LeakSensorPlatformAccessory {
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
     this.service.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
-    if (!this.platform.config.options.hide_temperature){
+    if (!this.platform.config.options.hide_temperature) {
       this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
       this.temperatureService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.TempStatusActive);
     }

@@ -1,114 +1,114 @@
 {
-    "pluginAlias": "honeywellLeak",
-    "pluginType": "platform",
-    "singular": true,
-    "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\n[Honeywell Leak Detector](https://www.honeywellhome.com/en/products/water-alarms/lyric-wi-fi-water-leak-and-freeze-detector) / [Resideo Droplet](https://www.resideo.com/us/en/products/water/spot-leak-detection/wifi-water-leak-freeze-detector-rchw3610wf1001-u/) plugin for [Homebridge](https://github.com/nfarina/homebridge).  To get started link your Honeywell Home account using the button below.",
-    "footerDisplay": "Your Honeywell Home account has been linked. Please raise any issues on our [project page](https://github.com/donavanbecker/homebridge-honeywell-leak/issues).",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "default": "Honeywell Leak",
-          "required": true,
-          "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
-        },
-        "credentials": {
-          "type": "object",
-          "properties": {
-            "consumerKey": {
-              "title": "Consumer Key",
-              "type": "string",
-              "required": true,
-              "placeholder": "ZSDLrHxcpOWpTknhpm0vZEwTSxJyy0TJ",
-              "minLength": 32,
-              "maxLength": 32,
-              "description": "Your OAuth2 consumer key for accessing the Honeywell Home API."
-            },
-            "consumerSecret": {
-              "title": "Consumer Secret",
-              "type": "string",
-              "placeholder": "LDKrtgR8CbCVNHfg",
-              "required": true,
-              "minLength": 16,
-              "maxLength": 16,
-              "description": "Your OAuth2 consumer secret for accessing the Honeywell Home API."
-            },
-            "refreshToken": {
-              "title": "Refresh Token",
-              "type": "string",
-              "required": true,
-              "placeholder": "mLDpbntbv8gq4yt9pcPOxASV6VPrrzin",
-              "minLength": 32,
-              "maxLength": 32,
-              "description": "Your OAuth2 refresh token for accessing the Honeywell Home API."
-            },
-            "notice": {
-              "title": "Notice",
-              "type": "string",
-              "required": true,
-              "default": "Keep your tokens a secret!"
-            }
+  "pluginAlias": "honeywellLeak",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\n[Honeywell Leak Detector](https://www.honeywellhome.com/en/products/water-alarms/lyric-wi-fi-water-leak-and-freeze-detector) / [Resideo Droplet](https://www.resideo.com/us/en/products/water/spot-leak-detection/wifi-water-leak-freeze-detector-rchw3610wf1001-u/) plugin for [Homebridge](https://github.com/nfarina/homebridge).  To get started link your Honeywell Home account using the button below.",
+  "footerDisplay": "Your Honeywell Home account has been linked. Please raise any issues on our [project page](https://github.com/donavanbecker/homebridge-honeywell-leak/issues).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "Name",
+        "default": "Honeywell Leak",
+        "required": true,
+        "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
+      },
+      "credentials": {
+        "type": "object",
+        "properties": {
+          "consumerKey": {
+            "title": "Consumer Key",
+            "type": "string",
+            "required": true,
+            "placeholder": "ZSDLrHxcpOWpTknhpm0vZEwTSxJyy0TJ",
+            "minLength": 32,
+            "maxLength": 32,
+            "description": "Your OAuth2 consumer key for accessing the Honeywell Home API."
+          },
+          "consumerSecret": {
+            "title": "Consumer Secret",
+            "type": "string",
+            "placeholder": "LDKrtgR8CbCVNHfg",
+            "required": true,
+            "minLength": 16,
+            "maxLength": 16,
+            "description": "Your OAuth2 consumer secret for accessing the Honeywell Home API."
+          },
+          "refreshToken": {
+            "title": "Refresh Token",
+            "type": "string",
+            "required": true,
+            "placeholder": "mLDpbntbv8gq4yt9pcPOxASV6VPrrzin",
+            "minLength": 32,
+            "maxLength": 32,
+            "description": "Your OAuth2 refresh token for accessing the Honeywell Home API."
+          },
+          "notice": {
+            "title": "Notice",
+            "type": "string",
+            "required": true,
+            "default": "Keep your tokens a secret!"
           }
-        },
-        "options": {
-          "type": "object",
-          "properties": {
-            "ttl": {
-              "title": "TTL",
-              "type": "number",
-              "minimum": 300,
-              "required": false
-            },
-            "hide_temperature": {
-              "title": "Hide Temperature Sensor",
-              "type": "boolean",
-              "required": false
-            },
-            "hide_humidity": {
-              "title": "Hide Humidity Sensor",
-              "type": "boolean",
-              "required": false
-            }
+        }
+      },
+      "options": {
+        "type": "object",
+        "properties": {
+          "ttl": {
+            "title": "TTL",
+            "type": "number",
+            "minimum": 300,
+            "required": false
+          },
+          "hide_temperature": {
+            "title": "Hide Temperature Sensor",
+            "type": "boolean",
+            "required": false
+          },
+          "hide_humidity": {
+            "title": "Hide Humidity Sensor",
+            "type": "boolean",
+            "required": false
           }
         }
       }
-    },
-    "layout": [
-      {
-        "type": "fieldset",
-        "title": "Advanced Settings",
-        "expandable": true,
-        "expanded": false,
-        "items": [
-          {
-            "type": "fieldset",
-            "title": "Manual Setup",
-            "expandable": true,
-            "expanded": false,
-            "items": [
-              {
-                "type": "help",
-                "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
-              },
-              "name",
-              "credentials.consumerKey",
-              "credentials.consumerSecret",
-              "credentials.refreshToken"
-            ]
-          },
-          {
-            "type": "help",
-            "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
-          },
-          {
-            "key": "options.ttl",
-            "notitle": true
-          },
-          "options.hide_temperature",
-          "options.hide_humidity"
-        ]
-      }
-    ]
-  }
+    }
+  },
+  "layout": [
+    {
+      "type": "fieldset",
+      "title": "Advanced Settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "fieldset",
+          "title": "Manual Setup",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
+            },
+            "name",
+            "credentials.consumerKey",
+            "credentials.consumerSecret",
+            "credentials.refreshToken"
+          ]
+        },
+        {
+          "type": "help",
+          "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
+        },
+        {
+          "key": "options.ttl",
+          "notitle": true
+        },
+        "options.hide_temperature",
+        "options.hide_humidity"
+      ]
+    }
+  ]
+}
