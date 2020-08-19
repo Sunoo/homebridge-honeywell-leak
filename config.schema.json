@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "honeywellLeak",
+  "pluginAlias": "HoneywellLeak",
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\n[Honeywell Leak Detector](https://www.honeywellhome.com/en/products/water-alarms/lyric-wi-fi-water-leak-and-freeze-detector) / [Resideo Droplet](https://www.resideo.com/us/en/products/water/spot-leak-detection/wifi-water-leak-freeze-detector-rchw3610wf1001-u/) plugin for [Homebridge](https://github.com/nfarina/homebridge).  To get started link your Honeywell Home account using the button below.",
@@ -10,7 +10,7 @@
       "name": {
         "type": "string",
         "title": "Name",
-        "default": "Honeywell Leak",
+        "default": "HoneywellLeak",
         "required": true,
         "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
       },
