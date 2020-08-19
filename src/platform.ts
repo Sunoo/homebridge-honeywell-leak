@@ -287,7 +287,6 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
             this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
           }
         } else {
-          // eslint-disable-next-line max-len
           this.log.info(`Ignoring Device ID: ${device.deviceID}, Alive Status: ${device.isAlive}`);
         }
       }
