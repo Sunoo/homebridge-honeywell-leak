@@ -33,7 +33,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     if (!this.config) {
       return;
     }
-      
+
     // verify the config
     try {
       this.verifyConfig();
@@ -85,7 +85,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
   }
-  
+
   /**
    * Verify the config passed to the plugin is valid
    */
@@ -141,7 +141,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       this.log.warn('Please re-link your account in the Homebridge UI.');
       // if no consumerSecret is defined, attempt to use the shared consumerSecret
       try {
-        result = (await axios.post(UIurl, 
+        result = (await axios.post(UIurl,
           {
             consumerKey: this.config.credentials.consumerKey,
             refresh_token: this.config.credentials.refreshToken,
@@ -161,7 +161,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       this.log.warn('New refresh token:', result.refresh_token);
       await this.updateRefreshToken(result.refresh_token);
     }
-    
+
     this.config.credentials.refreshToken = result.refresh_token;
   }
 
@@ -223,10 +223,10 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       this.log.error('Could not discover devices.', e.message);
       return;
     }
-    
+
     // get the locations
     const locations = (await this.axios.get(LocationURL)).data;
-    
+
     this.log.info(`# of Locations Found: ${locations.length}.`);
 
     // get the devices at each location
@@ -236,7 +236,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       const locationId = location.locationID;
       this.log.debug(locationId);
       this.log.debug(location);
-      this.log.debug(`# of Leak Sensors Found at ${location.name}: ${location.devices.length}.`);  
+      this.log.debug(`# of Leak Sensors Found at ${location.name}: ${location.devices.length}.`);
       const devices = (await this.axios.get(DeviceURL, {
         params: {
           locationId: location.locationID,
@@ -246,7 +246,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
         this.log.debug(device);
         this.log.debug(device.deviceID);
 
-        if (device.isAlive && device.deviceClass === 'LeakDetector') { 
+        if (device.isAlive && device.deviceClass === 'LeakDetector') {
           this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}${device.deviceID}`);
           const uuid = this.api.hap.uuid.generate(`${device.userDefinedDeviceName}${device.deviceID}`);
 
@@ -257,7 +257,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
           if (existingAccessory) {
             // the accessory already exists
             this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-                    
+
             // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
             existingAccessory.context.firmwareRevision = device.firmwareVer;
             this.api.updatePlatformAccessories([existingAccessory]);
@@ -287,8 +287,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
             this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
           }
         } else {
-          // eslint-disable-next-line max-len
-          this.log.info(`Ignoring device named ${device.userDefinedDeviceName} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
+          this.log.info(`Ignoring Device ID: ${device.deviceID}, Alive Status: ${device.isAlive}`);
         }
       }
     }
