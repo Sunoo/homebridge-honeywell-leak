@@ -94,7 +94,7 @@ export class LeakSensorPlatformAccessory {
       // Temperature Sensor
       this.temperatureService = accessory.addService(this.platform.Service.TemperatureSensor,
         `${this.device.userDefinedDeviceName} Temperature Sensor`);
-  
+
       // Set Temperature Sensor - Current Temperature  
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
@@ -111,7 +111,7 @@ export class LeakSensorPlatformAccessory {
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
     if (!this.humidityService && !this.platform.config.options.hide_humidity) {
       // Humidity Sensor
-      this.humidityService = accessory.addService(this.platform.Service.HumiditySensor, 
+      this.humidityService = accessory.addService(this.platform.Service.HumiditySensor,
         `${this.device.userDefinedDeviceName} Humidity Sensor`);
 
       // Set Humidity Sensor Current Relative Humidity
