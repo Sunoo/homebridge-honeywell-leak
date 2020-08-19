@@ -64,8 +64,7 @@ export class LeakSensorPlatformAccessory {
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.LeakSensor) ||
-      this.accessory.addService(this.platform.Service.LeakSensor),
-      `${this.device.userDefinedDeviceName} Leak Sensor`;
+      this.accessory.addService(this.platform.Service.LeakSensor), `${this.device.userDefinedDeviceName} Leak Sensor`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -90,12 +89,12 @@ export class LeakSensorPlatformAccessory {
     this.service.getCharacteristic(this.platform.Characteristic.LeakDetected)
       .on('get', this.handleLeakDetectedGet.bind(this));
 
+    this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
     if (!this.temperatureService && !this.platform.config.options.hide_temperature) {
       // Temperature Sensor
-      this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor) ?
-        accessory.getService(this.platform.Service.TemperatureSensor) : accessory.addService(this.platform.Service.TemperatureSensor,
-          `${this.device.userDefinedDeviceName} Temperature Sensor`);
-
+      this.temperatureService = accessory.addService(this.platform.Service.TemperatureSensor,
+        `${this.device.userDefinedDeviceName} Temperature Sensor`);
+  
       // Set Temperature Sensor - Current Temperature  
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
@@ -109,11 +108,11 @@ export class LeakSensorPlatformAccessory {
       accessory.removeService(this.temperatureService);
     }
 
+    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
     if (!this.humidityService && !this.platform.config.options.hide_humidity) {
       // Humidity Sensor
-      this.humidityService = accessory.getService(this.platform.Service.HumiditySensor) ?
-        accessory.getService(this.platform.Service.HumiditySensor) : accessory.addService(this.platform.Service.HumiditySensor,
-          `${this.device.userDefinedDeviceName} Humidity Sensor`);
+      this.humidityService = accessory.addService(this.platform.Service.HumiditySensor, 
+        `${this.device.userDefinedDeviceName} Humidity Sensor`);
 
       // Set Humidity Sensor Current Relative Humidity
       this.humidityService
