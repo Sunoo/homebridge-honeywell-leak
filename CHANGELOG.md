@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 2.1.0](https://github.com/donavanbecker/homebridge-honeywell-leak/compare/v2.0.0...v2.0.1) (2020-08-21)
+
+### Changes
+
+- Made Battery Service the main service so that there is an option to hide the leak sensor.
+- Added option to hide Leak Sensor.
+
 ## [Version 2.0.1](https://github.com/donavanbecker/homebridge-honeywell-leak/compare/v2.0.0...v2.0.1) (2020-08-18)
 
 ### Changes

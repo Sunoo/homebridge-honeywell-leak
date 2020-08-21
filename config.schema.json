@@ -61,6 +61,11 @@
             "minimum": 300,
             "required": false
           },
+          "hide_leak": {
+            "title": "Hide Leak Sensor",
+            "type": "boolean",
+            "required": false
+          },
           "hide_temperature": {
             "title": "Hide Temperature Sensor",
             "type": "boolean",
@@ -106,6 +111,7 @@
           "key": "options.ttl",
           "notitle": true
         },
+        "options.hide_leak",
         "options.hide_temperature",
         "options.hide_humidity"
       ]
