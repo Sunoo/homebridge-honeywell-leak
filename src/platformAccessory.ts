@@ -87,9 +87,7 @@ export class LeakSensorPlatformAccessory {
       .on('get', this.handleBatteryLevelGet.bind(this));
 
     // Set Charging State
-    this.service
-      .getCharacteristic(this.platform.Characteristic.ChargingState)
-      .on('get', this.handleChargingStateGet.bind(this));
+    this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
 
     // Set Status Low Battery
     this.service
@@ -197,7 +195,6 @@ export class LeakSensorPlatformAccessory {
 
     // Battery Service
     this.BatteryLevel = this.device.batteryRemaining;
-    this.ChargingState = 2;
     if (this.device.batteryRemaining < 30) {
       this.StatusLowBattery = 1;
     } else if (this.device.batteryRemaining > 30) {
@@ -232,7 +229,6 @@ export class LeakSensorPlatformAccessory {
  */
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
-    this.service.updateCharacteristic(this.platform.Characteristic.ChargingState, this.ChargingState);
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
     if (!this.platform.config.options.hide_temperature) {
       this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
@@ -328,19 +324,6 @@ export class LeakSensorPlatformAccessory {
 
     // set this to a valid value for Motion Detected
     const currentValue = this.BatteryLevel;
-
-    this.doSensorUpdate.next();
-    callback(null, currentValue);
-  }
-
-  /**
- * Handle requests to get the current value of the "Motion Sensor" characteristics
- */
-  handleChargingStateGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Battery Charging Status: ${this.ChargingState}`);
-
-    // set this to a valid value for Motion Detected
-    const currentValue = this.ChargingState;
 
     this.doSensorUpdate.next();
     callback(null, currentValue);
