@@ -99,7 +99,7 @@ export class LeakSensorPlatformAccessory {
     // Leak Sensor
     this.leakService = accessory.getService(this.platform.Service.LeakSensor);
     if (!this.leakService && !this.platform.config.options.hide_leak) {
-      this.humidityService = accessory.addService(this.platform.Service.LeakSensor,
+      this.leakService = accessory.addService(this.platform.Service.LeakSensor,
         `${this.device.userDefinedDeviceName} Leak Sensor`);
 
       // Set Humidity Sensor Current Relative Humidity
