@@ -95,6 +95,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     }
     this.config.options.hide_humidity;
     this.config.options.hide_temperature;
+    this.config.options.hide_leak;
 
     this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
 
