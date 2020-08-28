@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 2.1.1](https://github.com/donavanbecker/homebridge-honeywell-leak/compare/v2.1.0...v2.1.1) (2020-08-28)
+
+### Changes
+
+- Fixed issue with hiding Leak Sensor, which could cause errors.
+
 ## [Version 2.1.0](https://github.com/donavanbecker/homebridge-honeywell-leak/compare/v2.0.1...v2.1.0) (2020-08-24)
 
 ### Changes

@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Honeywell Leak",
   "name": "homebridge-honeywell-leak",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Honeywell Weak Leak Detector / Resideo Droplet plugin for Homebridge.",
   "author": "donavanbecker",
   "license": "Apache-2.0",

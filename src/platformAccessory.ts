@@ -230,7 +230,7 @@ export class LeakSensorPlatformAccessory {
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    if (!this.platform.config.options.hide_temperature) {
+    if (!this.platform.config.options.hide_leak) {
       this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
       this.leakService.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
     }
