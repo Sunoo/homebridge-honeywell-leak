@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 2.2.0](https://github.com/donavanbecker/homebridge-honeywell-leak/compare/v2.1.1...v2.2.0) (2020-08-29)
+
+### Changes
+
+- If device is no longer Alive or Active it will automatically be removed.
+
 ## [Version 2.1.1](https://github.com/donavanbecker/homebridge-honeywell-leak/compare/v2.1.0...v2.1.1) (2020-08-28)
 
 ### Changes

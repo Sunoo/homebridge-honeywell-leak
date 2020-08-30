@@ -257,16 +257,21 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
 
           if (existingAccessory) {
             // the accessory already exists
-            this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+            if (device.isAlive) {
+              this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
-            // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-            existingAccessory.context.firmwareRevision = device.firmwareVer;
-            this.api.updatePlatformAccessories([existingAccessory]);
+              // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+              existingAccessory.context.firmwareRevision = device.firmwareVer;
+              this.api.updatePlatformAccessories([existingAccessory]);
 
-            // create the accessory handler for the restored accessory
-            // this is imported from `platformAccessory.ts`
-            new LeakSensorPlatformAccessory(this, existingAccessory, locationId, device);
-
+              // create the accessory handler for the restored accessory
+              // this is imported from `platformAccessory.ts`
+              new LeakSensorPlatformAccessory(this, existingAccessory, locationId, device);
+            } else if (!device.isAlive) {
+              // remove platform accessories when no longer present
+              this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+              this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
+            }
           } else {
             // the accessory does not yet exist, so we need to create it
             this.log.info('Adding new accessory:', device.userDefinedDeviceName);
