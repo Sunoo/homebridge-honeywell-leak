@@ -1,11 +1,25 @@
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
+import {
+  API,
+  DynamicPlatformPlugin,
+  Logger,
+  PlatformAccessory,
+  PlatformConfig,
+  Service,
+  Characteristic,
+} from 'homebridge';
 import { interval } from 'rxjs';
 import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
-
-import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
-import { LeakSensorPlatformAccessory } from './platformAccessory';
+import {
+  PLATFORM_NAME,
+  PLUGIN_NAME,
+  AuthURL,
+  LocationURL,
+  UIurl,
+} from './settings';
+import { LeakSensor } from './Sensors/leakSensors';
+import * as configTypes from './configTypes';
 
 /**
  * HomebridgePlatform
@@ -14,7 +28,8 @@ import { LeakSensorPlatformAccessory } from './platformAccessory';
  */
 export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
+  public readonly Characteristic: typeof Characteristic = this.api.hap
+    .Characteristic;
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
@@ -22,6 +37,10 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
   public axios: AxiosInstance = axios.create({
     responseType: 'json',
   });
+
+  locations!: configTypes.location | any;
+  firmware!: configTypes.accessoryAttribute['softwareRevision'];
+  sensoraccessory!: configTypes.sensoraccessory;
 
   constructor(
     public readonly log: Logger,
@@ -39,13 +58,15 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       this.verifyConfig();
       this.log.debug('Config OK');
     } catch (e) {
-      this.log.error(e.message);
+      this.log.error(JSON.stringify(e.message));
+      this.log.debug(JSON.stringify(e));
       return;
     }
 
     // setup axios interceptor to add headers / api key to each request
     this.axios.interceptors.request.use((request) => {
-      request.headers.Authorization = 'Bearer ' + this.config.credentials.accessToken;
+      request.headers.Authorization =
+        'Bearer ' + this.config.credentials.accessToken;
       request.params = request.params || {};
       request.params.apikey = this.config.credentials.consumerKey;
       request.headers['Content-Type'] = 'application/json';
@@ -59,19 +80,35 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     this.api.on('didFinishLaunching', async () => {
       log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your devices as accessories
-      try {
-        await this.discoverDevices();
-      } catch (e) {
-        this.log.error('Failed to refresh access token.', e.message);
-      }
-
       interval((1800 / 3) * 1000).subscribe(async () => {
         try {
           await this.getAccessToken();
         } catch (e) {
-          this.log.error('Failed to refresh access token.');
+          this.log.error(
+            'Failed to refresh access token.',
+            JSON.stringify(e.message),
+          );
+          this.log.debug(JSON.stringify(e));
         }
       });
+      try {
+        this.locations = await this.discoverlocations();
+      } catch (e) {
+        this.log.error(
+          'Failed to Discover Locations.',
+          JSON.stringify(e.message),
+        );
+        this.log.debug(JSON.stringify(e));
+      }
+      try {
+        this.discoverDevices();
+      } catch (e) {
+        this.log.error(
+          'Failed to Discover Devices.',
+          JSON.stringify(e.message),
+        );
+        this.log.debug(JSON.stringify(e));
+      }
     });
   }
 
@@ -93,14 +130,34 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     if (!this.config.options || typeof this.config.options !== 'object') {
       this.config.options = {};
     }
-    this.config.options.hide_humidity;
-    this.config.options.hide_temperature;
-    this.config.options.hide_leak;
+    if (
+      !this.config.options.leaksensor ||
+      typeof this.config.options.leaksensor !== 'object'
+    ) {
+      this.config.options.leaksensor = {};
+    }
+
+    // Leak Sensor Config Options
+    this.config.options.leaksensor.hide;
+    this.config.options.leaksensor.hide_humidity;
+    this.config.options.leaksensor.hide_temperature;
+    this.config.options.leaksensor.hide_leak;
+
+    /**
+     * Hidden Device Discovery Option
+     * This will disable adding any device and will just output info.
+     */
+    this.config.devicediscovery;
 
     this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
 
-    if (!this.config.credentials.consumerSecret && this.config.options.ttl < 1800) {
-      this.log.debug('TTL must be set to 1800 or higher unless you setup your own consumerSecret.');
+    if (
+      !this.config.credentials.consumerSecret &&
+      this.config.options.ttl < 1800
+    ) {
+      this.log.debug(
+        'TTL must be set to 1800 or higher unless you setup your own consumerSecret.',
+      );
       this.config.options.ttl = 1800;
     }
 
@@ -122,34 +179,40 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     let result: any;
 
     if (this.config.credentials.consumerSecret) {
-      result = (await axios({
-        url: AuthURL,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        auth: {
-          username: this.config.credentials.consumerKey,
-          password: this.config.credentials.consumerSecret,
-        },
-        data: qs.stringify({
-          grant_type: 'refresh_token',
-          refresh_token: this.config.credentials.refreshToken,
-        }),
-        responseType: 'json',
-      })).data;
+      result = (
+        await axios({
+          url: AuthURL,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          auth: {
+            username: this.config.credentials.consumerKey,
+            password: this.config.credentials.consumerSecret,
+          },
+          data: qs.stringify({
+            grant_type: 'refresh_token',
+            refresh_token: this.config.credentials.refreshToken,
+          }),
+          responseType: 'json',
+        })
+      ).data;
     } else {
       this.log.warn('Please re-link your account in the Homebridge UI.');
       // if no consumerSecret is defined, attempt to use the shared consumerSecret
       try {
-        result = (await axios.post(UIurl,
-          {
+        result = (
+          await axios.post(UIurl, {
             consumerKey: this.config.credentials.consumerKey,
             refresh_token: this.config.credentials.refreshToken,
-          },
-        )).data;
+          })
+        ).data;
       } catch (e) {
-        this.log.error('Failed to exchange refresh token for an access token.', e.message);
+        this.log.error(
+          'Failed to exchange refresh token for an access token.',
+          JSON.stringify(e.message),
+        );
+        this.log.debug(JSON.stringify(e));
         throw e;
       }
     }
@@ -169,7 +232,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
   /**
    * The refresh token will periodically change.
    * This method saves the updated refresh token in the config.json file
-   * @param newRefreshToken 
+   * @param newRefreshToken
    */
   async updateRefreshToken(newRefreshToken: string) {
     try {
@@ -179,7 +242,9 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       }
 
       // load in the current config
-      const currentConfig = JSON.parse(readFileSync(this.api.user.configPath(), 'utf8'));
+      const currentConfig = JSON.parse(
+        readFileSync(this.api.user.configPath(), 'utf8'),
+      );
 
       // check the platforms section is an array before we do array things on it
       if (!Array.isArray(currentConfig.platforms)) {
@@ -187,10 +252,14 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       }
 
       // find this plugins current config
-      const pluginConfig = currentConfig.platforms.find(x => x.platform === PLATFORM_NAME);
+      const pluginConfig = currentConfig.platforms.find(
+        (x: { platform: string }) => x.platform === PLATFORM_NAME,
+      );
 
       if (!pluginConfig) {
-        throw new Error(`Cannot find config for ${PLATFORM_NAME} in platforms array`);
+        throw new Error(
+          `Cannot find config for ${PLATFORM_NAME} in platforms array`,
+        );
       }
 
       // check the .credentials is an object before doing object things with it
@@ -202,98 +271,236 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       pluginConfig.credentials.refreshToken = newRefreshToken;
 
       // save the config, ensuring we maintain pretty json
-      writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
+      writeFileSync(
+        this.api.user.configPath(),
+        JSON.stringify(currentConfig, null, 4),
+      );
 
-      this.log.warn('Homebridge config.json has been updated with new refresh token.');
-
+      this.log.warn(
+        'Homebridge config.json has been updated with new refresh token.',
+      );
     } catch (e) {
-      this.log.error(`Failed to update refresh token in config: ${e.message}`);
+      this.log.error(
+        'Failed to update refresh token in config:',
+        JSON.stringify(e.message),
+      );
+      this.log.debug(JSON.stringify(e));
     }
   }
 
   /**
-   * This is an example method showing how to register discovered accessories.
-   * Accessories must only be registered once, previously created accessories
-   * must not be registered again to prevent "duplicate UUID" errors.
+   * this method discovers the Locations
    */
-  async discoverDevices() {
+  async discoverlocations() {
     // try and get the access token. If it fails stop here.
     try {
       await this.getAccessToken();
     } catch (e) {
-      this.log.error('Could not discover devices.', e.message);
+      this.log.error(
+        'Failed to refresh access token.',
+        JSON.stringify(e.message),
+      );
+      this.log.debug(JSON.stringify(e));
       return;
     }
-
-    // get the locations
     const locations = (await this.axios.get(LocationURL)).data;
+    this.log.info(`Total Locations Found: ${locations.length}`);
+    return locations;
+  }
 
-    this.log.info(`# of Locations Found: ${locations.length}.`);
-
-    // get the devices at each location
-    for (const location of locations) {
-      this.log.info(`Getting devices for ${location.name}...`);
-
-      const locationId = location.locationID;
-      this.log.debug(locationId);
-      this.log.debug(location);
-      this.log.debug(`# of Leak Sensors Found at ${location.name}: ${location.devices.length}.`);
-      const devices = (await this.axios.get(DeviceURL, {
-        params: {
-          locationId: location.locationID,
-        },
-      })).data;
-      for (const device of devices) {
-        this.log.debug(device);
-        this.log.debug(device.deviceID);
-
-        if (device.isAlive && device.deviceClass === 'LeakDetector') {
-          this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}${device.deviceID}`);
-          const uuid = this.api.hap.uuid.generate(`${device.userDefinedDeviceName}${device.deviceID}`);
-
-          // see if an accessory with the same uuid has already been registered and restored from
-          // the cached devices we stored in the `configureAccessory` method above
-          const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
-
-          if (existingAccessory) {
-            // the accessory already exists
-            if (device.isAlive) {
-              this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-
-              // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-              existingAccessory.context.firmwareRevision = device.firmwareVer;
-              this.api.updatePlatformAccessories([existingAccessory]);
-
-              // create the accessory handler for the restored accessory
-              // this is imported from `platformAccessory.ts`
-              new LeakSensorPlatformAccessory(this, existingAccessory, locationId, device);
-            } else if (!device.isAlive) {
-              // remove platform accessories when no longer present
-              this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-              this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
-            }
+  /**
+   * This method is used to discover the your location and devices.
+   * Accessories are registered by either their DeviceClass, DeviceModel, or DeviceID
+   */
+  private async discoverDevices() {
+    if (this.locations) {
+      // get the devices at each location
+      for (const location of this.locations) {
+        this.log.info(`Getting devices for ${location.name}...`);
+        this.log.info(
+          `Total Devices Found at ${location.name}: ${location.devices.length}`,
+        );
+        const locationId = location.locationID;
+        this.log.debug(JSON.stringify(location));
+        this.locationinfo(location);
+        for (const device of location.devices) {
+          if (device.isAlive && device.deviceClass === 'LeakDetector') {
+            this.deviceinfo(device);
+            this.log.debug(JSON.stringify(device));
+            this.Leak(device, locationId);
           } else {
-            // the accessory does not yet exist, so we need to create it
-            this.log.info('Adding new accessory:', device.userDefinedDeviceName);
-            this.log.debug(`Registering new device: ${device.userDefinedDeviceName} - ${device.deviceID}`);
-
-            // create a new accessory
-            const accessory = new this.api.platformAccessory(device.userDefinedDeviceName, uuid);
-
-            // store a copy of the device object in the `accessory.context`
-            // the `context` property can be used to store any data about the accessory you may need
-            accessory.context.device = device;
-            accessory.context.firmwareRevision = device.firmwareVer;
-
-            // create the accessory handler for the newly create accessory
-            // this is imported from `platformAccessory.ts`
-            new LeakSensorPlatformAccessory(this, accessory, locationId, device);
-
-            // link the accessory to your platform
-            this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+            this.log.info(
+              'A Device was found that is not supported, Please open Feature Request Here: https://git.io/JUWN2, If you would like to see support.',
+            );
           }
-        } else {
-          this.log.info(`Ignoring Device ID: ${device.deviceID}, Alive Status: ${device.isAlive}`);
+        }
+      }
+    } else {
+      this.log.error(
+        'Failed to Discover Locations. Re-Link Your Honeywell Home Account.',
+      );
+    }
+  }
+
+  private Leak(
+    device: configTypes.LeakDevice,
+    locationId: configTypes.location['locationID'],
+  ) {
+    const uuid = this.api.hap.uuid.generate(
+      `${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`,
+    );
+
+    // see if an accessory with the same uuid has already been registered and restored from
+    // the cached devices we stored in the `configureAccessory` method above
+    const existingAccessory = this.accessories.find(
+      (accessory) => accessory.UUID === uuid,
+    );
+
+    if (existingAccessory) {
+      // the accessory already exists
+      if (!this.config.options.leaksensor.hide && device.isAlive) {
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
+
+        // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+        //existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+        //this.api.updatePlatformAccessories([existingAccessory]);
+
+        // create the accessory handler for the restored accessory
+        // this is imported from `platformAccessory.ts`
+        new LeakSensor(this, existingAccessory, locationId, device);
+        this.log.debug(
+          `Leak Sensor UDID: ${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`,
+        );
+      } else if (!device.isAlive || this.config.options.leaksensor.hide) {
+        this.unregisterPlatformAccessories(existingAccessory);
+      }
+    } else if (!this.config.options.leaksensor.hide) {
+      // the accessory does not yet exist, so we need to create it
+      this.log.info(
+        'Adding new accessory:',
+        `${device.userDefinedDeviceName}  ${device.deviceClass}`,
+      );
+      this.log.debug(
+        `Registering new device: ${device.userDefinedDeviceName} ${device.deviceClass} - ${device.deviceID}`,
+      );
+
+      // create a new accessory
+      const accessory = new this.api.platformAccessory(
+        `${device.userDefinedDeviceName} ${device.deviceClass}`,
+        uuid,
+      );
+
+      // store a copy of the device object in the `accessory.context`
+      // the `context` property can be used to store any data about the accessory you may need
+      accessory.context.device = device;
+      // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+      // create the accessory handler for the newly create accessory
+      // this is imported from `/Sensors/leakSensors.ts`
+      new LeakSensor(this, accessory, locationId, device);
+      this.log.debug(
+        `Leak Sensor UDID: ${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`,
+      );
+
+      // link the accessory to your platform
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
+    }
+  }
+
+  public unregisterPlatformAccessories(existingAccessory: PlatformAccessory) {
+    // remove platform accessories when no longer present
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+      existingAccessory,
+    ]);
+    this.log.info(
+      'Removing existing accessory from cache:',
+      existingAccessory.displayName,
+    );
+  }
+
+  public locationinfo(location: configTypes.location) {
+    if (this.config.devicediscovery) {
+      if (location) {
+        this.log.warn(JSON.stringify(location));
+      }
+    }
+  }
+
+  public deviceinfo(device: {
+    deviceID: string;
+    deviceType: string;
+    deviceClass: string;
+    deviceModel: string;
+    priorityType: string;
+    settings: { fan: { allowedModes: string[]; changeableValues: any } };
+    inBuiltSensorState: { roomId: number; roomName: string };
+    groups: configTypes.T9Thermostat['groups'];
+  }) {
+    if (this.config.devicediscovery) {
+      this.log.warn(JSON.stringify(device));
+      if (device.deviceID) {
+        this.log.warn(JSON.stringify(device.deviceID));
+        this.log.error(`Device ID: ${device.deviceID}`);
+      }
+      if (device.deviceType) {
+        this.log.warn(JSON.stringify(device.deviceType));
+        this.log.error(`Device Type: ${device.deviceType}`);
+      }
+      if (device.deviceClass) {
+        this.log.warn(JSON.stringify(device.deviceClass));
+        this.log.error(`Device Class: ${device.deviceClass}`);
+      }
+      if (device.deviceModel) {
+        this.log.warn(JSON.stringify(device.deviceModel));
+        this.log.error(`Device Model: ${device.deviceModel}`);
+      }
+      if (device.priorityType) {
+        this.log.warn(JSON.stringify(device.priorityType));
+        this.log.error(`Device Priority Type: ${device.priorityType}`);
+      }
+      if (device.settings) {
+        this.log.warn(JSON.stringify(device.settings));
+        if (device.settings.fan) {
+          this.log.warn(JSON.stringify(device.settings.fan));
+          this.log.error(`Device Fan Settings: ${device.settings.fan}`);
+          if (device.settings.fan.allowedModes) {
+            this.log.warn(JSON.stringify(device.settings.fan.allowedModes));
+            this.log.error(
+              `Device Fan Allowed Modes: ${device.settings.fan.allowedModes}`,
+            );
+          }
+          if (device.settings.fan.changeableValues) {
+            this.log.warn(JSON.stringify(device.settings.fan.changeableValues));
+            this.log.error(
+              `Device Fan Changeable Values: ${device.settings.fan.changeableValues}`,
+            );
+          }
+        }
+      }
+      if (device.inBuiltSensorState) {
+        this.log.warn(JSON.stringify(device.inBuiltSensorState));
+        if (device.inBuiltSensorState.roomId) {
+          this.log.warn(JSON.stringify(device.inBuiltSensorState.roomId));
+          this.log.error(
+            `Device Built In Sensor Room ID: ${device.inBuiltSensorState.roomId}`,
+          );
+        }
+        if (device.inBuiltSensorState.roomName) {
+          this.log.warn(JSON.stringify(device.inBuiltSensorState.roomName));
+          this.log.error(
+            `Device Built In Sensor Room Name: ${device.inBuiltSensorState.roomName}`,
+          );
+        }
+      }
+      if (device.groups) {
+        this.log.warn(JSON.stringify(device.groups));
+
+        for (const group of device.groups) {
+          this.log.error(`Group: ${group.id}`);
         }
       }
     }
