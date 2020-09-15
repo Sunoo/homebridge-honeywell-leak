@@ -1,7 +1,10 @@
+import {
+  PlatformConfig,
+} from 'homebridge';
+
 //Config
-export type HoneywellPlatformConfig = {
-  name: string;
-  devicediscovery: boolean;
+export interface HoneywellPlatformConfig extends PlatformConfig {
+  devicediscovery?: boolean;
   credentials: credentials;
   options: options;
 }
@@ -15,16 +18,15 @@ export type credentials = {
 
 export type options = {
   leaksensor: leaksensor;
-  ttl: number;
+  ttl?: number;
 };
 
 export type leaksensor = {
-  hide: boolean;
-  hide_humidity: boolean;
-  hide_temperature: boolean;
-  hide_leak: boolean;
+  hide?: boolean;
+  hide_humidity?: boolean;
+  hide_temperature?: boolean;
+  hide_leak?: boolean;
 };
-
 
 // Location
 export type location = {

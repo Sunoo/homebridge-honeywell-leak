@@ -3,7 +3,6 @@ import {
   DynamicPlatformPlugin,
   Logger,
   PlatformAccessory,
-  PlatformConfig,
   Service,
   Characteristic,
 } from 'homebridge';
@@ -19,7 +18,14 @@ import {
   UIurl,
 } from './settings';
 import { LeakSensor } from './Sensors/leakSensors';
-import * as configTypes from './configTypes';
+import {
+  HoneywellPlatformConfig,
+  location,
+  accessoryAttribute,
+  sensoraccessory,
+  T9Thermostat,
+  LeakDevice,
+} from './configTypes';
 
 /**
  * HomebridgePlatform
@@ -27,30 +33,26 @@ import * as configTypes from './configTypes';
  * parse the user config and discover/register accessories with Homebridge.
  */
 export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
-  public readonly config: configTypes.HoneywellPlatformConfig;
-  public readonly Service: typeof Service = this.api.hap.Service;
+  public readonly Service: typeof Service = this.api.hap.Service
   public readonly Characteristic: typeof Characteristic = this.api.hap
-    .Characteristic;
-    
+    .Characteristic
 
   // this is used to track restored cached accessories
-  public readonly accessories: PlatformAccessory[] = [];
+  public readonly accessories: PlatformAccessory[] = []
 
   public axios: AxiosInstance = axios.create({
     responseType: 'json',
-  });
+  })
 
-  locations!: configTypes.location | any;
-  firmware!: configTypes.accessoryAttribute['softwareRevision'];
-  sensoraccessory!: configTypes.sensoraccessory;
+  locations!: location | any
+  firmware!: accessoryAttribute['softwareRevision']
+  sensoraccessory!: sensoraccessory
 
   constructor(
     public readonly log: Logger,
-    config: PlatformConfig,
+    public readonly config: HoneywellPlatformConfig,
     public readonly api: API,
   ) {
-    this.config = config as unknown as configTypes.HoneywellPlatformConfig;
-
     this.log.debug('Finished initializing platform:', this.config.name);
     // only load if configured
     if (!this.config) {
@@ -107,10 +109,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       try {
         this.discoverDevices();
       } catch (e) {
-        this.log.error(
-          'Failed to Discover Devices.',
-          JSON.stringify(e.message),
-        );
+        this.log.error('Failed to Discover Devices.', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }
     });
@@ -337,8 +336,8 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
   }
 
   private Leak(
-    device: configTypes.LeakDevice,
-    locationId: configTypes.location['locationID'],
+    device: LeakDevice,
+    locationId: location['locationID'],
   ) {
     const uuid = this.api.hap.uuid.generate(
       `${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`,
@@ -416,7 +415,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     );
   }
 
-  public locationinfo(location: configTypes.location) {
+  public locationinfo(location: location) {
     if (this.config.devicediscovery) {
       if (location) {
         this.log.warn(JSON.stringify(location));
@@ -425,14 +424,14 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
   }
 
   public deviceinfo(device: {
-    deviceID: string;
-    deviceType: string;
-    deviceClass: string;
-    deviceModel: string;
-    priorityType: string;
-    settings: { fan: { allowedModes: string[]; changeableValues: any } };
-    inBuiltSensorState: { roomId: number; roomName: string };
-    groups: configTypes.T9Thermostat['groups'];
+    deviceID: string
+    deviceType: string
+    deviceClass: string
+    deviceModel: string
+    priorityType: string
+    settings: { fan: { allowedModes: string[]; changeableValues: any } }
+    inBuiltSensorState: { roomId: number; roomName: string }
+    groups: T9Thermostat['groups']
   }) {
     if (this.config.devicediscovery) {
       this.log.warn(JSON.stringify(device));
