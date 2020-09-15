@@ -1,3 +1,31 @@
+//Config
+export type HoneywellPlatformConfig = {
+  name: string;
+  devicediscovery: boolean;
+  credentials: credentials;
+  options: options;
+}
+
+export type credentials = {
+  accessToken: string;
+  consumerKey: string;
+  consumerSecret: string;
+  refreshToken: string;
+};
+
+export type options = {
+  leaksensor: leaksensor;
+  ttl: number;
+};
+
+export type leaksensor = {
+  hide: boolean;
+  hide_humidity: boolean;
+  hide_temperature: boolean;
+  hide_leak: boolean;
+};
+
+
 // Location
 export type location = {
   locationID: number;

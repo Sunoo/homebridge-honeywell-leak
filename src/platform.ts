@@ -27,9 +27,11 @@ import * as configTypes from './configTypes';
  * parse the user config and discover/register accessories with Homebridge.
  */
 export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
+  public readonly config: configTypes.HoneywellPlatformConfig;
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap
     .Characteristic;
+    
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
@@ -44,9 +46,11 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
 
   constructor(
     public readonly log: Logger,
-    public readonly config: PlatformConfig,
+    config: PlatformConfig,
     public readonly api: API,
   ) {
+    this.config = config as unknown as configTypes.HoneywellPlatformConfig;
+
     this.log.debug('Finished initializing platform:', this.config.name);
     // only load if configured
     if (!this.config) {
@@ -127,16 +131,6 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
    * Verify the config passed to the plugin is valid
    */
   verifyConfig() {
-    if (!this.config.options || typeof this.config.options !== 'object') {
-      this.config.options = {};
-    }
-    if (
-      !this.config.options.leaksensor ||
-      typeof this.config.options.leaksensor !== 'object'
-    ) {
-      this.config.options.leaksensor = {};
-    }
-
     // Leak Sensor Config Options
     this.config.options.leaksensor.hide;
     this.config.options.leaksensor.hide_humidity;
