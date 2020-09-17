@@ -11,8 +11,7 @@
         "type": "string",
         "title": "Name",
         "default": "HoneywellLeak",
-        "required": true,
-        "description": "A unique name for the accessory. It will be used as the accessory name in HomeKit."
+        "required": true
       },
       "credentials": {
         "type": "object",
@@ -20,29 +19,16 @@
           "consumerKey": {
             "title": "Consumer Key",
             "type": "string",
-            "required": true,
-            "placeholder": "ZSDLrHxcpOWpTknhpm0vZEwTSxJyy0TJ",
-            "minLength": 32,
-            "maxLength": 32,
-            "description": "Your OAuth2 consumer key for accessing the Honeywell Home API."
+            "required": true
           },
           "consumerSecret": {
             "title": "Consumer Secret",
-            "type": "string",
-            "placeholder": "LDKrtgR8CbCVNHfg",
-            "required": true,
-            "minLength": 16,
-            "maxLength": 16,
-            "description": "Your OAuth2 consumer secret for accessing the Honeywell Home API."
+            "type": "string"
           },
           "refreshToken": {
             "title": "Refresh Token",
             "type": "string",
-            "required": true,
-            "placeholder": "mLDpbntbv8gq4yt9pcPOxASV6VPrrzin",
-            "minLength": 32,
-            "maxLength": 32,
-            "description": "Your OAuth2 refresh token for accessing the Honeywell Home API."
+            "required": true
           },
           "notice": {
             "title": "Notice",
@@ -59,22 +45,34 @@
             "title": "TTL",
             "type": "number",
             "minimum": 300,
-            "required": false
+            "placeholder": 300,
+            "description": "Indicates the number of seconds between polls of the Honeywell Home service."
           },
-          "hide_leak": {
-            "title": "Hide Leak Sensor",
-            "type": "boolean",
-            "required": false
-          },
-          "hide_temperature": {
-            "title": "Hide Temperature Sensor",
-            "type": "boolean",
-            "required": false
-          },
-          "hide_humidity": {
-            "title": "Hide Humidity Sensor",
-            "type": "boolean",
-            "required": false
+          "leaksensor": {
+            "title": "Leak Sensor",
+            "type": "object",
+            "properties": {
+              "hide": {
+                "title": "Hide Leak Sensor(s)",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_leak": {
+                "title": "Hide Leak Service",
+                "type": "boolean",
+                "required": false
+              },
+              "hide_temperature": {
+                "title": "Hide Temperature Service",
+                "type": "boolean",
+                "required": false
+              },
+              "hide_humidity": {
+                "title": "Hide Humidity Service",
+                "type": "boolean",
+                "required": false
+              }
+            }
           }
         }
       }
@@ -83,26 +81,26 @@
   "layout": [
     {
       "type": "fieldset",
-      "title": "Advanced Settings",
+      "title": "Honeywell Home Account Info",
       "expandable": true,
       "expanded": false,
       "items": [
         {
-          "type": "fieldset",
-          "title": "Manual Setup",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
-            },
-            "name",
-            "credentials.consumerKey",
-            "credentials.consumerSecret",
-            "credentials.refreshToken"
-          ]
+          "type": "help",
+          "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
         },
+        "name",
+        "credentials.consumerKey",
+        "credentials.consumerSecret",
+        "credentials.refreshToken"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced Settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
         {
           "type": "help",
           "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
@@ -111,9 +109,26 @@
           "key": "options.ttl",
           "notitle": true
         },
-        "options.hide_leak",
-        "options.hide_temperature",
-        "options.hide_humidity"
+        {
+          "type": "fieldset",
+          "title": "Leak Sensor Options",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5>Leak Sensors</h5><em class='primary-text'>Allows you to hide your Leak Sensor(s).</em>"
+            },
+            "options.leaksensor.hide",
+            {
+              "type": "help",
+              "helpvalue": "<h5>Hide Leak Sensor Services</h5><em class='primary-text'>Allows you to hide your Leak Sensor's tempeture sensor, leak sensor, or humidity sensor.</em>"
+            },
+            "options.leaksensor.hide_temperature",
+            "options.leaksensor.hide_leak",
+            "options.leaksensor.hide_humidity"
+          ]
+        }
       ]
     }
   ]
