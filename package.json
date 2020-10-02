@@ -15,7 +15,7 @@
   "homepage": "https://github.com/donavanbecker/homebridge-honeywell-leak#readme",
   "engines": {
     "node": ">=12.18.3",
-    "homebridge": ">=1.2.2"
+    "homebridge": ">=1.2.3"
   },
   "main": "dist/index.js",
   "scripts": {
@@ -63,8 +63,8 @@
     "@typescript-eslint/parser": "^4.1.1",
     "eslint": "^7.9.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "homebridge": "^1.2.2",
-    "homebridge-config-ui-x": "^4.27.1",
+    "homebridge": "^1.2.3",
+    "homebridge-config-ui-x": "^4.28.0",
     "nodemon": "^2.0.4",
     "prettier": "^2.1.2",
     "rimraf": "^3.0.2",
