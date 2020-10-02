@@ -112,6 +112,8 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
      */
     this.config.devicediscovery;
 
+    this.config.options = this.config.options || {};
+
     if (this.config.options?.leaksensor) {
       // Leak Sensor Config Options
       this.config.options.leaksensor.hide;
@@ -120,10 +122,10 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       this.config.options.leaksensor.hide_leak;
     }
 
-    if (!this.config.options?.ttl) {
-      this.config.options!.ttl = 300;
+    if (this.config.options) {
+      this.config.options.ttl = this.config.options?.ttl || 300;
     } else {
-      this.config.options?.ttl;
+      this.config.options!.ttl = 300;
     }
 
     //this.config.options!.ttl = this.config.options?.ttl || 300; // default 300 seconds
