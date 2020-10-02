@@ -120,7 +120,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
       this.config.options.leaksensor.hide_leak;
     }
 
-    this.config.options!.ttl! = this.config.options?.ttl || 300; // default 300 seconds
+    this.config.options!.ttl! = this.config.options!.ttl || 300; // default 300 seconds
 
     if (!this.config.credentials?.consumerSecret && this.config.options!.ttl! < 300) {
       this.log.debug('TTL must be set to 300 or higher unless you setup your own consumerSecret.');
