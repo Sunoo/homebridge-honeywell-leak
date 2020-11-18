@@ -123,7 +123,7 @@ export class HoneywellLeakPlatform implements DynamicPlatformPlugin {
     }
 
     if (this.config.options) {
-      this.config.options.ttl = this.config.options!.ttl || 300;
+      this.config.options.ttl = this.config.options!.ttl || 300; // default 300 seconds
     }
 
     if (!this.config.credentials?.consumerSecret && this.config.options!.ttl! < 300) {
